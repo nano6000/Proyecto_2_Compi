@@ -2,7 +2,7 @@
 #include "scanner.h"
 #include "parser.tab.c"
 //#include "beamerWrite.c"
-#include "lex.yy.c"
+//#include "lex.yy.c"
 #define BETWEEN(value, min, max) (value <= max && value >= min)
 
 #define MAX_INCLUDE_DEPTH 10
@@ -232,11 +232,8 @@ struct Token getToken(){
 }
 
 char *getTokenFamily(int tokenId){
-	if (tokenId == I_CONSTANT){
-		return "I_CONSTANT";
-	}
-	else if(tokenId == F_CONSTANT){
-		return "F_CONSTAN";
+	if (tokenId == CONSTANT){
+		return "CONSTANT";
 	}
 	else if(tokenId == INCLUDE){
 		return "INCLUDE";
@@ -325,7 +322,7 @@ int main(int argc, char **argv)
 	free(outputName);
 
 	yylineno = 1;
-    yyin = fopen("scannedFile.txt", "r");
+    yyin = fopen("output.c", "r");
     yyparse();
 
     fclose(yyin);

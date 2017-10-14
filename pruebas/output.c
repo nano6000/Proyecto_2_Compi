@@ -1,18 +1,18 @@
-Hola a todos :3
-Mae que sueno....
+int b;
+int c;
 
 int yywrap(void)
 {
 	return 1;
 }
 
-Quiero dormir!! T-T
+int a;
 
 
 int main()
 {
 	int pedo = 0xCACA;
-	int adios mother fuckers! :) = 10;
+	int jaja = 10;
 	printf ("%d", a+=2);
     return 0;
 }

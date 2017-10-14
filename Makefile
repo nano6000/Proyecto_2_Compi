@@ -2,7 +2,7 @@ CC = gcc
 OBJS = scanner.c
 FLEX = flex.l
 BISON = parser.y
-OUT = scan
+OUT = pruebas/scan
 
 compile: $(OBJS)
 	$(CC) -o $(OUT) $(OBJS) 
@@ -12,14 +12,14 @@ flex: $(FLEX)
 	lex $(FLEX)
 
 bison: $(BISON)
-	bison -d -g parser.y
+	bison -d parser.y
 
 debug: $(OBJS)
 	$(CC) -g -o $(OUT) $(OBJS)
 	gdb $(OUT)
 
 all:
-	rm -f lex.yy.c
+	bison $(BISON)
 	lex $(FLEX)
 	$(CC) -o $(OUT) $(OBJS) 
 

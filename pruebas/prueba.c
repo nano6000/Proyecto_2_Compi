@@ -1,7 +1,6 @@
 #include "prueba.h"
 #include "forth.h"
-#define hola adios \
-		mother fuckers! :)
+#define hola jaja
 
 int main()
 {
