@@ -1,1 +1,10 @@
-int a =0;
+int main()
+{
+	a
+	gg = ;
+}
+
+int hola()
+{
+	b
+}

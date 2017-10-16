@@ -462,6 +462,7 @@ labeled_statement
 compound_statement
 	: LBRACKET RBRACKET
 	| LBRACKET  block_item_list RBRACKET
+	| LBRACKET error RBRACKET { yyclearin; }
 	;
 
 block_item_list
@@ -529,5 +530,30 @@ extern int yylineno;
 extern char* yytext;
 void yyerror(const char *s)
 {
-	printf("%s in line: %i, lexeme: %s\n", s, yylineno, yytext);
+	//printf("%s in line: %i, lexeme: %s\n", s, yylineno, yytext);
+	
+
+	FILE *file = fopen("output.c", "r");
+	int count = 0;
+	if ( file != NULL )
+	{
+	    char line[256]; /* or other suitable maximum line size */
+	    while (fgets(line, sizeof line, file) != NULL) /* read a line */
+	    {
+	        if (count == yylineno-1)
+	        {
+	            printf("%s in line: %i\n-->  %s\n", s, yylineno, line);
+	            break;
+	        }
+	        else
+	        {
+	            count++;
+	        }
+	    }
+	    fclose(file);
+	}
+	else
+	{
+	    printf("Error al reportar el error");
+	}
 }

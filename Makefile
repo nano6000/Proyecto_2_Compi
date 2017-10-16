@@ -19,7 +19,7 @@ debug: $(OBJS)
 	gdb $(OUT)
 
 all:
-	bison $(BISON)
+	bison -d -t $(BISON)
 	lex $(FLEX)
 	$(CC) -o $(OUT) $(OBJS) 
 

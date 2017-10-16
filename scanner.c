@@ -57,10 +57,10 @@ void reset(char *d)
 
 void read_includes()
 {
-	/*while(token.tokenId == SEPARATOR)
+	while(token.tokenId == SEPARATOR)
 	{
 		getToken();
-	}*/
+	}
 	//printf("%s\n", token.lexeme);
 	getToken();
 	if (token.tokenId == STRING)
@@ -99,7 +99,7 @@ void read_define()
 	strgcpy(defineTable[cant_define][0], yytext);
 	//printf("Lexema %s\n", defineTable[cant_define][0]);
 	getToken();
-	printf("Lexema %s\n", yytext);
+	//printf("Lexema %s\n", yytext);
 	//getToken();
 	
 	while(token.tokenId == SEPARATOR)
@@ -120,7 +120,7 @@ void read_define()
 		else
 		{
 			strgcpy(defineTable[cant_define][1], yytext);
-			printf("Reemplazo %s\n", yytext);
+			//printf("Reemplazo %s\n", yytext);
 		}	
 		getToken();
 	}
@@ -328,7 +328,7 @@ int main(int argc, char **argv)
     yyin = fopen("output.c", "r");
     
     extern int yydebug;
-    yydebug = 1;
+    yydebug = 0;
     
     yyparse();
 

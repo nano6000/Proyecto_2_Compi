@@ -1,12 +1,10 @@
-
- 
- 
- 
- int   main ( ) 
+int   main ( ) 
  { 
- 	 int   pedo   =   0xCACA ; 
- 	 int   jaja   =   10 ; 
- 	 printf   ( "%d" ,   a += 2 ) ; 
-         return   0 ; 
+ 	 a 
+ 	 gg   =   ; 
  } 
  
+ int   hola ( ) 
+ { 
+ 	 b 
+ } 
