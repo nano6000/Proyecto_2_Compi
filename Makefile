@@ -12,7 +12,7 @@ flex: $(FLEX)
 	lex $(FLEX)
 
 bison: $(BISON)
-	bison -d parser.y
+	bison -d -t parser.y
 
 debug: $(OBJS)
 	$(CC) -g -o $(OUT) $(OBJS)
