@@ -57,10 +57,10 @@ void reset(char *d)
 
 void read_includes()
 {
-	while(token.tokenId == SEPARATOR)
+	/*while(token.tokenId == SEPARATOR)
 	{
 		getToken();
-	}
+	}*/
 	//printf("%s\n", token.lexeme);
 	if (token.tokenId == STRING)
 	{
@@ -90,7 +90,7 @@ void read_includes()
 void read_define()
 {
 	int backslash = 0;
-	while(token.tokenId == SEPARATOR)
+	/*while(token.tokenId == SEPARATOR)
 	{
 		getToken();
 	}
@@ -103,7 +103,7 @@ void read_define()
 	while(token.tokenId == SEPARATOR)
 	{
 		getToken();
-	}
+	}*/
 	while(*yytext != '\n' | backslash)
 	{
 		if (token.tokenId == BACKSLASH)
@@ -186,11 +186,11 @@ int preprocessor(void)
 	    }
 	    if(*replacement!='\0')
 	    {
-	    	fprintf(yyout, "%s", replacement);
+	    	fprintf(yyout, "%s ", replacement);
 	        reset(replacement);
 	    }
 	    else
-	    	fprintf(yyout, "%s", yytext);
+	    	fprintf(yyout, "%s ", yytext);
 		getToken();
 	    //printf("Token: %s\n", yytext);
 		
@@ -286,7 +286,7 @@ int main(int argc, char **argv)
 
     yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
 
-    FILE* out_file;
+    /*FILE* out_file;
 	out_file = fopen("scannedFile.txt", "w");
     yyout = out_file;
 	
@@ -294,7 +294,7 @@ int main(int argc, char **argv)
 	//currentLine = token.lineNo;
 	//system("rm latex/result.tex");
 	//copy(TEMPLATE_HEAD, BEAMER_FILE);
-	/*while(token.tokenId) 
+	while(token.tokenId) 
 	{
 		
 		//while (currentLine == token.lineNo && token.tokenId){
@@ -317,14 +317,19 @@ int main(int argc, char **argv)
 	//compileLatex();
 	
 	//yyterminate();
-	fclose(out_file);
-	fclose(yyin);
+	//fclose(out_file);
+	//fclose(yyin);
 	free(outputName);
 
 	yylineno = 1;
     yyin = fopen("output.c", "r");
+    
+    extern int yydebug;
+    yydebug = 1;
+    
     yyparse();
 
     fclose(yyin);
+    yyterminate();
 	return 0;
 }

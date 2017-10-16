@@ -137,7 +137,7 @@ COMMENT		    ("/*"[^*]*[*]+([^/*][^*]*[*]+)*[/])|"//".*
 {STRING}				return STRING;
 {CHARACTER}			    return CHARACTER;
 {ID}					return ID;
-[ \t\n]+ 				printf(" ESPACIO \n");
+[ \t\n]+ 				;
 <<EOF>>    			    return 0;
 {COMMENT}				;
 .						{printf("TOKEN irreconocible %s en la linea: %d\n", yytext, yylineno);}
