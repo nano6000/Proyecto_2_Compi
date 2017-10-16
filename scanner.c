@@ -62,6 +62,7 @@ void read_includes()
 		getToken();
 	}*/
 	//printf("%s\n", token.lexeme);
+	getToken();
 	if (token.tokenId == STRING)
 	{
 		if ( include_stack_ptr >= MAX_INCLUDE_DEPTH )
@@ -94,17 +95,18 @@ void read_define()
 	{
 		getToken();
 	}
-	
+	*/
 	strgcpy(defineTable[cant_define][0], yytext);
 	//printf("Lexema %s\n", defineTable[cant_define][0]);
 	getToken();
-	getToken();
+	printf("Lexema %s\n", yytext);
+	//getToken();
 	
-	while(token.tokenId == SEPARATOR)
+	/*while(token.tokenId == SEPARATOR)
 	{
 		getToken();
 	}*/
-	while(*yytext != '\n' | backslash)
+	while(*yytext != '\\' | backslash)
 	{
 		if (token.tokenId == BACKSLASH)
 			backslash = 1;
