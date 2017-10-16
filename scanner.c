@@ -91,22 +91,22 @@ void read_includes()
 void read_define()
 {
 	int backslash = 0;
-	/*while(token.tokenId == SEPARATOR)
+	while(token.tokenId == SEPARATOR)
 	{
 		getToken();
 	}
-	*/
+	
 	strgcpy(defineTable[cant_define][0], yytext);
 	//printf("Lexema %s\n", defineTable[cant_define][0]);
 	getToken();
 	printf("Lexema %s\n", yytext);
 	//getToken();
 	
-	/*while(token.tokenId == SEPARATOR)
+	while(token.tokenId == SEPARATOR)
 	{
 		getToken();
-	}*/
-	while(*yytext != '\\' | backslash)
+	}
+	while(*yytext != '\n' | backslash)
 	{
 		if (token.tokenId == BACKSLASH)
 			backslash = 1;
@@ -120,6 +120,7 @@ void read_define()
 		else
 		{
 			strgcpy(defineTable[cant_define][1], yytext);
+			printf("Reemplazo %s\n", yytext);
 		}	
 		getToken();
 	}
@@ -155,8 +156,8 @@ int preprocessor(void)
 	int i, j;
 	for(i=0; i<ROWS; i++)
 	{
-		defineTable[i][0] = malloc(20 * sizeof(char));
-		defineTable[i][1] = malloc(1000 * sizeof(char));
+		defineTable[i][0] = malloc(512 * sizeof(char));
+		defineTable[i][1] = malloc(2048 * sizeof(char));
 	}
 	
 	

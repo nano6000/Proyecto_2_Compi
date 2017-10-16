@@ -96,15 +96,15 @@ COMMENT		    ("/*"[^*]*[*]+([^/*][^*]*[*]+)*[/])|"//".*
 "=="					return EQ_OP;
 "!="					return NE_OP;
 ";"						return SEMICOLON;
-"{"						return LBRACE;
-"}"						return RBRACE;
+"{"						return LBRACKET;
+"}"						return RBRACKET;
 ","						return COMMA;
 ":"						return COLON;
 "="						return EQUALS;
 "("						return LPARENTHESIS;
 ")"						return RPARENTHESIS;
-"["						return LBRACKET;
-"]"						return RBRACKET;
+"["						return LBRACE;
+"]"						return RBRACE;
 "."						return DOT;
 "&"						return AMPERSAND;
 "!"						return EXCLAMATION;
@@ -137,7 +137,7 @@ COMMENT		    ("/*"[^*]*[*]+([^/*][^*]*[*]+)*[/])|"//".*
 {STRING}				return STRING;
 {CHARACTER}			    return CHARACTER;
 {ID}					return ID;
-[ \t\n]+ 				;
+[ \t\n] 				return SEPARATOR;
 <<EOF>>    			    return 0;
 {COMMENT}				;
 .						{printf("TOKEN irreconocible %s en la linea: %d\n", yytext, yylineno);}
