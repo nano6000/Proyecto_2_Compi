@@ -1,336 +1,278 @@
- 
- 
- 
- ifndef 	 _CTYPE_H_ 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- ifdef   _NONSTD_SOURCE 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- endif   
- 
- 
- 
- 
- 
- 
- if   ! defined ( _DONT_USE_CTYPE_INLINE_ )   &&   \ 
-         ( defined ( _USE_CTYPE_INLINE_ )   ||   defined ( __GNUC__ )   ||   defined ( __cplusplus ) ) 
- 
- 
- __BEGIN_DECLS 
- unsigned   long 	 	 ___runetype ( __darwin_ct_rune_t ) ; 
- __darwin_ct_rune_t 	 ___tolower ( __darwin_ct_rune_t ) ; 
- __darwin_ct_rune_t 	 ___toupper ( __darwin_ct_rune_t ) ; 
- __END_DECLS 
- 
- __header_inline   int 
- isascii ( int   _c ) 
- { 
- 	 return   ( ( _c   &   ~ 0x7F )   ==   0 ) ; 
- } 
- 
- ifdef   USE_ASCII 
- __header_inline   int 
- __maskrune ( __darwin_ct_rune_t   _c ,   unsigned   long   _f ) 
- { 
- 	 return   ( int ) _DefaultRuneLocale . __runetype [ _c   &   0xff ]   &   ( __uint32_t ) _f ; 
- } 
- else   
- __BEGIN_DECLS 
- int                           	 __maskrune ( __darwin_ct_rune_t ,   unsigned   long ) ; 
- __END_DECLS 
- endif   
- 
- __header_inline   int 
- __istype ( __darwin_ct_rune_t   _c ,   unsigned   long   _f ) 
- { 
- ifdef   USE_ASCII 
- 	 return   ! ! ( __maskrune ( _c ,   _f ) ) ; 
- else   
- 	 return   ( isascii ( _c )   ?   ! ! ( _DefaultRuneLocale . __runetype [ _c ]   &   _f ) 
- 	 	 :   ! ! __maskrune ( _c ,   _f ) ) ; 
- endif   
- } 
- 
- __header_inline   __darwin_ct_rune_t 
- __isctype ( __darwin_ct_rune_t   _c ,   unsigned   long   _f ) 
- { 
- ifdef   USE_ASCII 
- 	 return   ! ! ( __maskrune ( _c ,   _f ) ) ; 
- else   
- 	 return   ( _c   < 0 || _c >= _CACHED_RUNES) ? 0 :
-		!!(_DefaultRuneLocale.__runetype[_c] & _f);
-#endif /* USE_ASCII */
-}
 
-#ifdef USE_ASCII
-__DARWIN_CTYPE_inline __darwin_ct_rune_t
-__toupper(__darwin_ct_rune_t _c)
-{
-	return _DefaultRuneLocale.__mapupper[_c & 0xff];
-}
-
-__DARWIN_CTYPE_inline __darwin_ct_rune_t
-__tolower(__darwin_ct_rune_t _c)
-{
-	return _DefaultRuneLocale.__maplower[_c & 0xff];
-}
-#else /* !USE_ASCII */
-__BEGIN_DECLS
-__darwin_ct_rune_t	__toupper(__darwin_ct_rune_t);
-__darwin_ct_rune_t	__tolower(__darwin_ct_rune_t);
-__END_DECLS
-#endif /* USE_ASCII */
-
-__DARWIN_CTYPE_inline int
-__wcwidth(__darwin_ct_rune_t _c)
-{
-	unsigned int _x;
-
-	if (_c == 0)
-		return (0);
-	_x = (unsigned int)__maskrune(_c, _CTYPE_SWM|_CTYPE_R);
-	if ((_x & _CTYPE_SWM) != 0)
-		return ((_x & _CTYPE_SWM) >> _CTYPE_SWS);
-	return ((_x & _CTYPE_R) != 0 ? 1 : -1);
-}
-
-#ifndef _EXTERNALIZE_CTYPE_INLINES_
-
-#define	_tolower(c)	__tolower(c)
-#define	_toupper(c)	__toupper(c)
-
-__DARWIN_CTYPE_TOP_inline int
-isalnum(int _c)
-{
-	return (__istype(_c, _CTYPE_A|_CTYPE_D));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-isalpha(int _c)
-{
-	return (__istype(_c, _CTYPE_A));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-isblank(int _c)
-{
-	return (__istype(_c, _CTYPE_B));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-iscntrl(int _c)
-{
-	return (__istype(_c, _CTYPE_C));
-}
-
-/* ANSI -- locale independent */
-__DARWIN_CTYPE_TOP_inline int
-isdigit(int _c)
-{
-	return (__isctype(_c, _CTYPE_D));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-isgraph(int _c)
-{
-	return (__istype(_c, _CTYPE_G));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-islower(int _c)
-{
-	return (__istype(_c, _CTYPE_L));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-isprint(int _c)
-{
-	return (__istype(_c, _CTYPE_R));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-ispunct(int _c)
-{
-	return (__istype(_c, _CTYPE_P));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-isspace(int _c)
-{
-	return (__istype(_c, _CTYPE_S));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-isupper(int _c)
-{
-	return (__istype(_c, _CTYPE_U));
-}
-
-/* ANSI -- locale independent */
-__DARWIN_CTYPE_TOP_inline int
-isxdigit(int _c)
-{
-	return (__isctype(_c, _CTYPE_X));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-toascii(int _c)
-{
-	return (_c & 0x7F);
-}
-
-__DARWIN_CTYPE_TOP_inline int
-tolower(int _c)
-{
-        return (__tolower(_c));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-toupper(int _c)
-{
-        return (__toupper(_c));
-}
-
-#if !defined(_ANSI_SOURCE) && (!defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE))
-__DARWIN_CTYPE_TOP_inline int
-digittoint(int _c)
-{
-	return (__maskrune(_c, 0x0F));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-ishexnumber(int _c)
-{
-	return (__istype(_c, _CTYPE_X));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-isideogram(int _c)
-{
-	return (__istype(_c, _CTYPE_I));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-isnumber(int _c)
-{
-	return (__istype(_c, _CTYPE_D));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-isphonogram(int _c)
-{
-	return (__istype(_c, _CTYPE_Q));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-isrune(int _c)
-{
-	return (__istype(_c, 0xFFFFFFF0L));
-}
-
-__DARWIN_CTYPE_TOP_inline int
-isspecial(int _c)
-{
-	return (__istype(_c, _CTYPE_T));
-}
-#endif /* !_ANSI_SOURCE && (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
-#endif /* _EXTERNALIZE_CTYPE_INLINES_ */
-
-#else /* not using inlines */
-
-__BEGIN_DECLS
-int     isalnum(int);
-int     isalpha(int);
-int     isblank(int);
-int     iscntrl(int);
-int     isdigit(int);
-int     isgraph(int);
-int     islower(int);
-int     isprint(int);
-int     ispunct(int);
-int     isspace(int);
-int     isupper(int);
-int     isxdigit(int);
-int     tolower(int);
-int     toupper(int);
-int     isascii(int);
-int     toascii(int);
-
-#if !defined(_ANSI_SOURCE) && (!defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE))
-int     _tolower(int);
-int     _toupper(int);
-int     digittoint(int);
-int     ishexnumber(int);
-int     isideogram(int);
-int     isnumber(int);
-int     isphonogram(int);
-int     isrune(int);
-int     isspecial(int);
-#endif
-__END_DECLS
-
-#endif /* using inlines */
-
-#ifdef _USE_EXTENDED_LOCALES_
-#include <xlocale/_ctype.h> 
- endif   
+ MicroInstruction   string2StructMicroInstruction ( char   * line ) { 
+ 	 MicroInstruction   microInstruction   =   { "" , "" , "" } ; 
+ 	 short   counter   =   0 ; 
+ 	 char   * iterator   =   line ; 
+ 	 char   * separator ; 
  
- endif   
+ 	 
+ 	 separator   =   strstr ( line ,   "<" ) ; 
+ 	 if   ( separator ) { 
+ 	 	 microInstruction . OP [ 0 ]   =   separator [ 0 ] ; 
+ 	 	 microInstruction . OP [ 1 ]   =   separator [ 1 ] ; 
+ 	 	 microInstruction . OP [ 2 ]   =   \ 0 ; 
+ 	 }   else   { 
  
-  int   c ; 
+ 	 	 
+ 	 	 separator   =   strstr ( line ,   ":" ) ; 
+ 	 	 if   ( separator ) { 
+ 	 	 	 microInstruction . OP [ 0 ]   =   separator [ 0 ] ; 
+ 	 	 	 microInstruction . OP [ 2 ]   =   \ 0 ; 
+ 	 	 }   else   { 
  
- int   main ( ) 
- { 
- 	 a   =   7 ; 
- 	 gg   =   10 ; 
- } 
+ 	 	 	 
+ 	 	 	 
+ 	 	 	 
+ 	 	 	 separator   =   line ; 
+ 	 	 	 while   ( * separator )   separator ++ ; 
  
+ 	 	 	 printf ( "Separator is %c\n" ,   * separator ) ; 
+ 	 	 } 
+ 	 } 
  
- int   hola ( ) 
- { 
- 	 b   =   8 ; 
+ 	 
+ 	 while   ( iterator   !=   separator )   { 
+ 	 	 if   ( * iterator   ==     )   { 
+ 	 	 	 iterator ++ ; 
+ 	 	 	 continue ; 
+ 	 	 } 
+ 	 	 microInstruction . leftOP [ counter ++ ]   =   * iterator ++ ; 
+ 	 } 
+ 
+ 	 
+ 	 microInstruction . leftOP [ counter ]   =   \ 0 ; 
+ 
+ 	 counter   =   0 ; 
+ 
+ 	 
+ 	 if   ( microInstruction . OP [ 0 ] ==   < )   iterator ++ ; 
+ 	 iterator ++ ; 
+ 
+ 	 if   ( microInstruction . OP [ 0 ]   ==   \ 0 )   return   microInstruction ; 
+ 
+ 	 
+ 	 while   ( * iterator   !=   \ 0 )   { 
+ 	 	 if   ( * iterator   ==     )   { 
+ 	 	 	 iterator ++ ; 
+ 	 	 	 continue ; 
+ 	 	 } 
+ 	 	 microInstruction . rightOP [ counter ++ ]   =   * iterator ++ ; 
+ 	 } 
+ 
+ 	 
+ 
+ 	 return   microInstruction ; 
  } 
  
  
  
+ void   parseMicroInstruction   ( MicroInstruction   microInstruction ) { 
+ 
+ 	 char   * separator ; 
+ 	 char   * registerX   =   calloc ( 3 ,   sizeof ( char ) ) ; 
+ 	 char   * registerY   =   calloc ( 3 ,   sizeof ( char ) ) ; 
+ 
+ 	 separator   =   strstr ( microInstruction . OP ,   "<" ) ; 
+ 	 if   ( separator )   { 
+ 	 	 parseMicroMov ( microInstruction ) ; 
+ 	 } else   { 
+ 	 	 separator   =   strstr ( microInstruction . OP ,   ":" ) ; 
+ 	 	 if   ( separator ) { 
+ 	 	 	   if ( ! strcmp ( microInstruction . leftOP ,   "ALU" ) ) { 
+ 	 	 	 	   
+ 	 	 	 	   parseMicroALU ( microInstruction ) ; 
+ 	 	 	   } else   if   ( ! strcmp ( microInstruction . leftOP ,   "MEM" ) ) { 
+ 	 	 	 	   parseMicroMEM ( microInstruction ) ; 
+ 	 	 	   } else   if   ( ! strcmp ( microInstruction . leftOP ,   "TEST" ) ) { 
+ 	 	 	 	   
+ 	 	 	   } else   printf ( "Microinstruction %s not recognized in %s%s%s\n" ,   microInstruction . leftOP ,   microInstruction . leftOP ,   microInstruction . OP ,   microInstruction . rightOP ) ; 
+ 
+ 	 	 } 
+ 	 	 else { 
+ 	 	 	 
+ 	 	 	 if   ( ! strcmp ( microInstruction . leftOP ,   "IN" ) ) { 
+ 	 	 	 	 printf ( "IN found\n" ) ; 
+ 	 	 	 } else   if   ( ! strcmp ( microInstruction . leftOP ,   "OUT" ) ) { 
+ 	 	 	 	 printf ( "OUT found\n" ) ; 
+ 	 	 	 } 
+ 	 	 	 
+ 	 	 	 else   printf ( "Microinstruction %s not recognized\n" ,   microInstruction . leftOP ) ; 
+ 
+ 	 	 } 
+ 	 } 
+ } 
+ 
+ 
+ void   parseMicroMov ( MicroInstruction   microInstruction ) { 
+ 
+ 	 
+ 	 if   ( microInstruction . leftOP [ 0 ] == [   ) { 
+ 	 	 printf ( "MicroInstruction invalid, can't <- between memory addresses: \"%s\"\n" ,   microInstruction . leftOP ) ; 
+ 	 	 return ; 
+ 	 } 
+ 	 if   ( microInstruction . rightOP [ 0 ] == [   ) { 
+ 	 	 printf ( "MicroInstruction invalid, can't <- between memory addresses: \"%s\"\n" ,   microInstruction . rightOP ) ; 
+ 	 	 return ; 
+ 	 } 
+ 
+ 	 int   i   =   0 ; 
+ 	 int   size   =   registerNamesLength ; 
+ 	 int   leftRegisterIndex   =   - 1 ; 
+ 	 int   rightRegisterIndex   =   - 1 ; 
+ 
+ 	 
+ 	 for   ( i   =   0 ;   i   <   size ; i ++ ) { 
+ 	 	 if   ( ! strcmp ( microInstruction . leftOP ,   registerNames [ i ] ) ) { 
+ 	 	 	 leftRegisterIndex   =   i ; 
+ 	 	 	 printf   ( "leftOP found at registerNames[%d]=%s\n" , i , registerNames [ i ] ) ; 
+ 	 	 	 break ; 
+ 	 	 } 
+ 	 } 
+ 
+ 	 
+ 	 if   ( leftRegisterIndex !=   - 1 ) { 
+ 
+ 	 	 
+ 	 	 if   ( isdigit ( microInstruction . rightOP [ 0 ] ) ) { 
+ 
+ 	 	 	 printf ( "It was a digit\n" ) ; 
+ 
+ 	 	 	 
+ 	 	 	 registers [ leftRegisterIndex ]   =   strtol ( microInstruction . rightOP , 0 , 10 ) ; 
+ 	 	 	 return ; 
+ 	 	 } 
+ 
+ 	 	 
+ 	 	 for   ( i   =   0 ;   i   <   size ; i ++ ) { 
+ 	 	 	 if   ( ! strcmp ( microInstruction . rightOP ,   registerNames [ i ] ) ) { 
+ 	 	 	 	 rightRegisterIndex   =   i ; 
+ 	 	 	 	 printf   ( "rightOP found at registerNames[%d]=%s\n" , i , registerNames [ i ] ) ; 
+ 	 	 	 	 break ; 
+ 	 	 	 } 
+ 	 	 } 
+ 	 	 
+ 	 	 if   ( rightRegisterIndex !=   - 1 ) { 
+ 
+ 	 	 	 
+ 	 	 	 registers [ leftRegisterIndex ]   =   registers [ rightRegisterIndex ] ; 
+ 	 	 	 for   ( i = 0 ; i < size ; i ++ ) { 
+ 	 	 	 	 printf ( "registers[%d]=%d\n" ,   i ,   registers [ i ] ) ; 
+ 	 	 	 } 
+ 
+ 	 	 } else { 
+ 	 	 	 printf ( "MicroInstruction <- not valid. Invalid right operand: \"%s\"\n" ,   microInstruction . rightOP ) ; 
+ 	 	 } 
+ 
+ 
+ 	 } else { 
+ 	 	 printf ( "MicroInstruction <- not valid. Invalid left operand: \"%s\"\n" ,   microInstruction . leftOP ) ; 
+ 	 } 
+ } 
+ 
+ void   parseMicroALU ( MicroInstruction   microInstruction ) { 
+ 
+ 	 int   i   =   0 ; 
+ 	 int   size   =   registerNamesLength ; 
+ 	 int   B1 ,   B2 ,   B3 ,   B4   =   - 1 ; 
+ 
+ 	 
+ 	 for   ( i   =   0 ;   i   <   size ; i ++ ) { 
+ 	 	 if   ( ! strcmp ( "B1" ,   registerNames [ i ] ) ) { 
+ 	 	 	 B1   =   i ; 
+ 	 	 	 B2   =   i + 1 ; 
+ 	 	 	 B3   =   i + 2 ; 
+ 	 	 	 B4   =   i + 3 ; 
+ 	 	 	 printf   ( "B registers found at registerNames[%d]=%s\n" , i , registerNames [ i ] ) ; 
+ 	 	 	 break ; 
+ 	 	 } 
+ 	 } 
+ 
+ 	 struct   ALU   alu   =   { registers [ B1 ] , registers [ B2 ] , registers [ B3 ] , registers [ B4 ] } ; 
+ 
+ 	 printf ( "%s \n" , microInstruction . leftOP ) ; 
+ 
+ 	 if   ( ! strcmp ( microInstruction . leftOP ,   "ALU" ) )   { 
+ 
+ 	 	 if   ( ! strcmp ( microInstruction . rightOP ,   "add" ) ) { 
+ 	 	 	 MicroAdd ( & alu ) ; 
+ 	 	 } 
+ 
+ 	 	 else   if   ( ! strcmp ( microInstruction . rightOP ,   "sub" ) ) { 
+ 	 	 	 MicroSub ( & alu ) ; 
+ 	 	 } 
+ 
+ 	 	 else   if   ( ! strcmp ( microInstruction . rightOP ,   "mul" ) ) { 
+ 	 	 	 MicroMul ( & alu ) ; 
+ 	 	 } 
+ 
+ 	 	 else   if   ( ! strcmp ( microInstruction . rightOP ,   "div" ) ) { 
+ 	 	 	 MicroDiv ( & alu ) ; 
+ 	 	 } 
+ 
+ 	 	 else   if   ( ! strcmp ( microInstruction . rightOP ,   "and" ) ) { 
+ 	 	 	 MicroAnd ( & alu ) ; 
+ 	 	 } 
+ 
+ 	 	 else   if   ( ! strcmp ( microInstruction . rightOP ,   "or" ) ) { 
+ 	 	 	 MicroOr ( & alu ) ; 
+ 	 	 } 
+ 
+ 	 	 else   if   ( ! strcmp ( microInstruction . rightOP ,   "xor" ) ) { 
+ 	 	 	 MicroXor ( & alu ) ; 
+ 	 	 } 
+ 
+ 	 	 else   if   ( ! strcmp ( microInstruction . rightOP ,     "not" ) ) { 
+ 	 	 	 MicroNot ( & alu ) ; 
+ 	 	 } 
+ 
+ 	 	 else   if   ( ! strcmp ( microInstruction . rightOP ,   "shr" ) ) { 
+ 	 	 	 MicroShr ( & alu ) ; 
+ 	 	 } 
+ 
+ 	 	 else   if   ( ! strcmp ( microInstruction . rightOP ,   "shl" ) ) { 
+ 	 	 	 MicroShl ( & alu ) ; 
+ 	 	 } 
+ 
+ 
+ 	 	 registers [ B1 ]   =   alu . B1 ; 
+ 	 	 registers [ B2 ]   =   alu . B2 ; 
+ 	 	 registers [ B3 ]   =   alu . B3 ; 
+ 	 	 registers [ B4 ]   =   alu . B4 ; 
+ 	 	 printf ( "%d \n" , registers [ B1 ] ) ; 
+ 	 	 printf ( "%d \n" , registers [ B2 ] ) ; 
+ 	 	 printf ( "%d \n" , registers [ B3 ] ) ; 
+ 	 	 printf ( "%d \n" , registers [ B4 ] ) ; 
+ 
+ 	 } else { 
+ 	 	 printf ( "MicroInstruction not recognized \"%s\"\n" ,   microInstruction . leftOP ) ; 
+ 	 	 return ; 
+ 
+ 	 	 } 
+ } 
+ 
+ 
+ 
+ void   parseMicroMEM ( MicroInstruction   microInstruction ) { 
+ 
+ 	 int   i   =   0 ; 
+ 	 int   size   =   registerNamesLength ; 
+ 	 int   MAR ; 
+ 
+ 	 for   ( i   =   0 ;   i   <   size ; i ++ ) { 
+ 	 	 if   ( ! strcmp ( "MAR" ,   registerNames [ i ] ) ) { 
+ 	 	 	 MAR   =   i ; 
+ 	 	 	 printf   ( "MAR register found at registerNames[%d]=%s\n" , i , registerNames [ i ] ) ; 
+ 	 	 	 break ; 
+ 	 	 } 
+ 	 } 
+ 
+ 	 if   ( ! strcmp ( microInstruction . rightOP ,   "R" ) ) { 
+ 	 	 MBR   =   memory [ MAR ] ; 
+ 	 } else   if   ( ! strcmp ( microInstruction . rightOP ,   "W" ) ) { 
+ 	 	 memory [ MAR ]   =   MBR ; 
+ 	 } else { 
+ 	 	 printf ( "Unknown MEM mode %s. Should be R for read and W for write\n" ,   microInstruction . rightOP ) ; 
+ 	 } 
+ 
+ } 
  

@@ -2,12 +2,12 @@
 #define R rand()
 //#include <math.h>
 //#include <X11/Xlib.h>
-#define T(i,F) ((So long)(i)<<F)
+/*#define T(i,F) ((So long)(i)<<F)
 #define O(c,L,i) c*sin(i)+L*cos(i)
 #define y(n,L) for(n=0; n<L 3; n++)     
 #define P(v,L) d=0; y(l,)d+=T(L*l[v],l*20);
 #define X(q) q>>10&63|q>>24&4032|q>>38&258048       
-char J[1<<18]; int G[W*p],_,k,I=W/4+1,w=p/4+1; float C,B,e;            
+*/char J[1<<18]; int G[W*p],_,k,I=W/4+1,w=p/4+1; float C,B,e;            
 
 unsigned So long A,n,d, t,h,x, f,o,r,a,l,L,F,i,s,H=1<<18,b=250,D[1<<14],z[W*p],q
 =0x820008202625a0;main(){Display *j=XOpenDisplay(0);Window u=XCreateSimpleWindow

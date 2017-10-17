@@ -1,0 +1,186 @@
+Creo que es esto
+Creo que es esto
+syntax error, unexpected ID in line: 8
+-->   = 0x820008202625a0 ; main ( ) { Display   * j = XOpenDisplay ( 0 ) ; Window   u = XCreateSimpleWindow 
+
+Value: main
+
+syntax error, unexpected EQUALS, expecting SEMICOLON or COMMA in line: 8
+-->   = 0x820008202625a0 ; main ( ) { Display   * j = XOpenDisplay ( 0 ) ; Window   u = XCreateSimpleWindow 
+
+Value: =
+
+syntax error, unexpected ID in line: 8
+-->   = 0x820008202625a0 ; main ( ) { Display   * j = XOpenDisplay ( 0 ) ; Window   u = XCreateSimpleWindow 
+
+Value: u
+
+syntax error, unexpected EQUALS, expecting SEMICOLON or COMMA in line: 9
+-->   ( j , RootWindow ( j , 0 ) , 0 , 0 , W , p , 1 , 0 , 0 ) ; XImage   * Y = XCreateImage ( j , DefaultVisual ( j , 0 ) , 24 
+
+Value: =
+
+syntax error, unexpected ID in line: 10
+-->   , 2 , 0 , ( char * ) G , W , p , 32 , 0 ) ;   XEvent   M ;   for ( XMapWindow ( j , u ) ;   XSelectInput (   j , u , 1 ) && a - 
+
+Value: M
+
+syntax error, unexpected RPARENTHESIS in line: 11
+-->   65307 ;   ) {   if ( ! H ) {   if ( XCheckWindowEvent ( j , u , 1 , & M ) ) {   a = XLookupKeysym ( & M . xkey , 0 ) ; * ( 
+
+Value: )
+
+syntax error, unexpected RPARENTHESIS, expecting SEMICOLON or COMMA in line: 11
+-->   65307 ;   ) {   if ( ! H ) {   if ( XCheckWindowEvent ( j , u , 1 , & M ) ) {   a = XLookupKeysym ( & M . xkey , 0 ) ; * ( 
+
+Value: )
+
+syntax error, unexpected ELSE in line: 16
+-->   s = a + 2 & 31                                                                                                                                 ) ;   } else 
+
+Value: else
+
+syntax error, unexpected ID in line: 19
+-->   ( l = i & 3 ) ;                 else {   l = F & 3 ;   o = W                               ;   }   h = z [ L - o * l ] ;   f                 = z [ L + ( 4 - 
+
+Value: f
+
+syntax error, unexpected ID in line: 22
+-->   long , 1 , B ) , m                 = 32768 , Q = m ;   a [ 4 ]                               = O ( - 1 , long , B ) ;   a [ 3 ] =                 O ( U , V , C ) 
+
+Value: a
+
+syntax error, unexpected LONG in line: 22
+-->   long , 1 , B ) , m                 = 32768 , Q = m ;   a [ 4 ]                               = O ( - 1 , long , B ) ;   a [ 3 ] =                 O ( U , V , C ) 
+
+Value: long
+
+syntax error, unexpected ID in line: 22
+-->   long , 1 , B ) , m                 = 32768 , Q = m ;   a [ 4 ]                               = O ( - 1 , long , B ) ;   a [ 3 ] =                 O ( U , V , C ) 
+
+Value: a
+
+syntax error, unexpected ID in line: 23
+-->   ;   a [ 5 ] = O                 ( - V , U , C ) ;   P ( ( a + 3                               ) , s * 42 ) ;   t || ( A = d )                 ; f = 0 ; y ( n 
+
+Value: a
+
+syntax error, unexpected ID in line: 23
+-->   ;   a [ 5 ] = O                 ( - V , U , C ) ;   P ( ( a + 3                               ) , s * 42 ) ;   t || ( A = d )                 ; f = 0 ; y ( n 
+
+Value: P
+
+syntax error, unexpected PLUS, expecting RPARENTHESIS in line: 23
+-->   ;   a [ 5 ] = O                 ( - V , U , C ) ;   P ( ( a + 3                               ) , s * 42 ) ;   t || ( A = d )                 ; f = 0 ; y ( n 
+
+Value: +
+
+syntax error, unexpected RPARENTHESIS, expecting SEMICOLON or COMMA in line: 23
+-->   ;   a [ 5 ] = O                 ( - V , U , C ) ;   P ( ( a + 3                               ) , s * 42 ) ;   t || ( A = d )                 ; f = 0 ; y ( n 
+
+Value: )
+
+syntax error, unexpected SEMICOLON, expecting RPARENTHESIS in line: 24
+-->   , ) { float                 N = a [ n + 3 ] ,   E = 1024                               / fabs ( N ) ;   b =   N < 0 ;                 float   K = 
+
+Value: ;
+
+syntax error, unexpected SHL, expecting RPARENTHESIS in line: 25
+-->   ( ( ( q >> 20                 * n ) ^ ~ - b ) + ! b & 1023                               ) / 1024 . ;   y ( d , ) a [ d                 ] = a [ d + 3 ] 
+
+Value: >>
+
+syntax error, unexpected STAR, expecting RPARENTHESIS in line: 26
+-->   * E ;   a [ n ]                 = round ( a [ n ] ) ;   P (                               a , K ) ;   i = q + d ;   P ( a ,                 1 ) ;   e = E * 
+
+Value: *
+
+syntax error, unexpected EQUALS, expecting RPARENTHESIS in line: 26
+-->   * E ;   a [ n ]                 = round ( a [ n ] ) ;   P (                               a , K ) ;   i = q + d ;   P ( a ,                 1 ) ;   e = E * 
+
+Value: =
+
+syntax error, unexpected LBRACE, expecting RPARENTHESIS or COMMA in line: 26
+-->   * E ;   a [ n ]                 = round ( a [ n ] ) ;   P (                               a , K ) ;   i = q + d ;   P ( a ,                 1 ) ;   e = E * 
+
+Value: [
+
+syntax error, unexpected SEMICOLON, expecting RPARENTHESIS in line: 26
+-->   * E ;   a [ n ]                 = round ( a [ n ] ) ;   P (                               a , K ) ;   i = q + d ;   P ( a ,                 1 ) ;   e = E * 
+
+Value: ;
+
+syntax error, unexpected CONSTANT, expecting ID in line: 26
+-->   * E ;   a [ n ]                 = round ( a [ n ] ) ;   P (                               a , K ) ;   i = q + d ;   P ( a ,                 1 ) ;   e = E * 
+
+Value: 1
+
+syntax error, unexpected SEMICOLON, expecting RPARENTHESIS in line: 27
+-->   K ;   for ( ;                                 e < m ;   i += d ) {   l = X ( i ) ;   t = r = l ^ ( l ^ l - (                                 1 << 6 * n ) ) 
+
+Value: ;
+
+syntax error, unexpected ID, expecting RPARENTHESIS in line: 28
+-->   & 63 << 6 * n                                 ;   if ( b ) {   r = l ;   l = t ;   }   if ( J [ r ] ) l = r                                 ;   if ( t = J 
+
+Value: l
+
+syntax error, unexpected LBRACKET, expecting RPARENTHESIS in line: 29
+-->   [ l ] ) { x = (                                 n - 1 ) ? ( i | i >> 40 ) & 1023 | i >> 8 & 4190208                                 | 4194304 
+
+Value: {
+
+syntax error, unexpected LBRACKET, expecting RPARENTHESIS in line: 31
+-->   & 0xf | x >>                                 14 & 0x3f0 ) + t * 768 ] ) {   o = h ;   f = n | l * 4 |                                 x << 32 ;   m 
+
+Value: {
+
+syntax error, unexpected ID in line: 34
+-->   16711935                                 ;   z [ L ] = 3 * ( Q <= m ) | f | b << 56 ;   }   else {                                 d = l * ( f << 
+
+Value: z
+
+syntax error, unexpected RBRACKET in line: 34
+-->   16711935                                 ;   z [ L ] = 3 * ( Q <= m ) | f | b << 56 ;   }   else {                                 d = l * ( f << 
+
+Value: }
+
+syntax error, unexpected ID in line: 35
+-->   8 >> 40 ) + (                                 4 - l ) * ( h << 8 >> 40 ) >> 2 & 16774143 ;   o = D                                 [ ( d >>   6 & 
+
+Value: o
+
+syntax error, unexpected RPARENTHESIS, expecting SEMICOLON or COMMA in line: 36
+-->   15 | d >> 14                                 & 1008 ) + J [ ( int ) h / 4 ] * 768 ] * ( b = h >> 56                                 ) >> 8 ;   G [ 
+
+Value: )
+
+syntax error, unexpected ID in line: 37
+-->   L ] = o >> 32                                 << 8   |   o &                                 16711935                                 ;   z [ L ] = ( 
+
+Value: z
+
+syntax error, unexpected RBRACKET in line: 38
+-->   int )   h | d                                 << 32 | b <<                                 56 ;   }   } }                                 }   q   += A ; 
+
+Value: }
+
+syntax error, unexpected LBRACE, expecting RPARENTHESIS or COMMA in line: 39
+-->   XPutImage                               ( j ,   u + 0 ,                               DefaultGC                                 ( j , J [ X ( q 
+
+Value: [
+
+syntax error, unexpected RBRACE, expecting RPARENTHESIS in line: 40
+-->   ) ] = 0 ) , Y ,                                 0 , 0 , 0 , 0 ,                                 W , p ) ;   } }                                 else {   L = 
+
+Value: ]
+
+syntax error, unexpected RBRACKET in line: 40
+-->   ) ] = 0 ) , Y ,                                 0 , 0 , 0 , 0 ,                                 W , p ) ;   } }                                 else {   L = 
+
+Value: }
+
+syntax error, unexpected RBRACKET in line: 51
+-->   - ( i & 1 ) ) ;   }   }   D [ H ] = ( a & 16711935 | ( a & 65280 ) << 24 ) * ( b >> ( F >> 5 ) ) >> 8 & 0xff00ff00ff ;   }   }   } } 
+Value: }
+
