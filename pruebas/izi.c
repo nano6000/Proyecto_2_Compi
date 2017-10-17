@@ -1,10 +1,23 @@
+#include <ctype.h>
+#include "third.h"
+
 int main()
 {
-	a
-	gg = ;
+	a = 7;
+	gg = 10;
 }
+
 
 int hola()
 {
-	b
+	b = 8;
 }
+
+
+/*
+
+if (encontro include)
+	sume_lineas_al_total_de_líneas();
+
+
+*/

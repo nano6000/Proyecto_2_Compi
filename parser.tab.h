@@ -146,7 +146,8 @@ extern int yydebug;
     INCLUDE = 356,
     DEFINE = 357,
     CHARACTER = 358,
-    SEPARATOR = 359
+    SEPARATOR = 359,
+    SYSTEM_INCLUDE = 360
   };
 #endif
 
