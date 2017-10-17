@@ -35,7 +35,8 @@ primary_expression
 	: ID
 	| CONSTANT
 	| STRING
-	| LPARENTHESIS expression RPARENTHESIS
+	| LPARENTHESIS expression RPARENTHESIS	
+	| LPARENTHESIS error RPARENTHESIS { yyclearin; }
 	| generic_selection
 	;
 

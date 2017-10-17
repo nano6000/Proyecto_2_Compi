@@ -1,7 +1,7 @@
 int main()
 {
 	a
-	gg = ;
+	(gg = );
 }
 
 int hola()
