@@ -1,5 +1,5 @@
 %{
-#include "lex.yy.c"	
+#include "lex.yy.c"
 void yyerror(const char *s);
 
 %}
@@ -15,7 +15,7 @@ void yyerror(const char *s);
 %token	TYPEDEF EXTERN STATIC AUTO REGISTER INLINE
 %token	CONST RESTRICT VOLATILE
 %token	BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE VOID
-%token	COMPLEX IMAGINARY 
+%token	COMPLEX IMAGINARY
 %token	STRUCT UNION ENUM ELLIPSIS
 
 %token	CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
@@ -26,6 +26,7 @@ void yyerror(const char *s);
 %token EQUALS LBRACKET RBRACKET DOT AMPERSAND EXCLAMATION MINUS PLUS TILDE
 %token STAR SLASH BACKSLASH MODULO LESS_THAN GREATER_THAN CARET PIPE QUESTION_MARK INCLUDE
 %token DEFINE CHARACTER SEPARATOR
+%token SYSTEM_INCLUDE
 
 %start translation_unit
 %define parse.error verbose
@@ -532,7 +533,7 @@ extern char* yytext;
 void yyerror(const char *s)
 {
 	//printf("%s in line: %i, lexeme: %s\n", s, yylineno, yytext);
-	
+
 
 	FILE *file = fopen("output.c", "r");
 	int count = 0;

@@ -10,6 +10,8 @@ struct Token {
 
 char *names[] = {NULL, "ALIGNOF", "AUTO", "BREAK", "CASE", "CHAR", "CONST", "CONTINUE", "DEFAULT", "DO", "DOUBLE", "ELSE", "ENUM", "EXTERN", "FLOAT", "FOR", "GOTO", "IF", "INLINE", "INT", "LONG", "REGISTER", "RESTRICT", "RETURN", "SHORT", "SIGNED", "SIZEOF", "STATIC", "STRUCT", "SWITCH", "TYPEDEF", "UNION", "UNSIGNED", "VOID", "VOLATILE", "WHILE", "ELLIPSIS", "RIGHT_ASSIGN", "LEFT_ASSIGN", "ADD_ASSIGN", "SUB_ASSIGN", "MUL_ASSIGN", "DIV_ASSIGN", "MOD_ASSIGN", "AND_ASSIGN", "XOR_ASSIGN", "OR_ASSIGN", "SHL", "SHR", "INC_OP", "DEC_OP", "PTR_OP", "AND_OP", "OR_OP", "LE_OP", "GE_OP", "EQ_OP", "NE_OP", "SEMICOLON", "LBRACE", "RBRACE", "COMMA", "COLON", "EQUALS", "LPARENTHESIS", "RPARENTHESIS", "LBRACKET", "RBRACKET", "DOT", "AMPERSAND", "EXCLAMATION", "TILDE", "MINUS", "PLUS", "STAR", "SLASH", "MODULO", "LESS_THAN", "GREATER_THAN", "CARET", "PIPE", "QUESTION_MARK",  "INCLUDE", "DEFINE",  "STRING", "CHARACTER", "ID", "CONSTANT", "BACKSLASH", "SEPARATOR"};
 struct Token getToken();
+char *includePaths[] = {"/usr/local/include/","/usr/include/"};
+int includePathsSize = sizeof(includePaths)/sizeof(includePaths[0]);
 
 char *getTokenFamily(int tokenId);
-
+int fileExists(char *filename);

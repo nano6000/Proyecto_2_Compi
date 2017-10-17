@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include "scanner.h"
 #include "parser.tab.c"
 //#include "beamerWrite.c"
@@ -23,7 +24,7 @@ struct Token token;
 char *defineTable[ROWS][COLUMNS]; //tabla de macros y sus definiciones
 int cant_define;	//Cantidad de defines actualeas
 char* replacement; //varible que contiene la definicion de una macro especifica
-char* outputName; 
+char* outputName;
 
 void rmQuote(char *d , char *s)
 {
@@ -32,13 +33,22 @@ void rmQuote(char *d , char *s)
 	while (*d++=*s++)
 		if (*s=='"')
 			s++;
-} 
+}
+
+void rmSysIncludesChars(char *d , char *s){
+	if (*s=='<')
+		s++;
+	while (*d++=*s++)
+		if (*s=='>')
+			s++;
+}
+
 
 void strgcpy(char *d , char *s)
 {
 	while (*d++);
 	for (--d;*d++=*s++;);
-} 
+}
 
 int strgcmp(char *d, char *s)
 {
@@ -53,7 +63,7 @@ int strgcmp(char *d, char *s)
 void reset(char *d)
 {
 	while (*d++='\0');
-} 
+}
 
 void read_includes()
 {
@@ -61,22 +71,46 @@ void read_includes()
 	{
 		getToken();
 	}
+	char *fullIncludePath = calloc(100, sizeof(char));
+
+
 	//printf("%s\n", token.lexeme);
-	getToken();
-	if (token.tokenId == STRING)
+	//getToken();
+
+	if (token.tokenId == STRING || token.tokenId == SYSTEM_INCLUDE)
 	{
+
 		if ( include_stack_ptr >= MAX_INCLUDE_DEPTH )
         {
             fprintf( stderr, "Includes nested too deeply" );
             exit( 1 );
         }
-        
-        rmQuote(outputName, token.lexeme);
+
+				if (token.tokenId == SYSTEM_INCLUDE){
+					rmSysIncludesChars(outputName, token.lexeme);
+					int i = 0;
+					int size = includePathsSize;
+					for(i = 0; i < size;i++){
+						strcpy(fullIncludePath, includePaths[i]);
+						strcat(fullIncludePath, outputName);
+						if (fileExists(fullIncludePath)){
+							outputName[0] = '\0';
+							strcpy(outputName, fullIncludePath);
+							break;
+						}
+					}
+				}else if (token.tokenId == STRING){
+					rmQuote(outputName, token.lexeme);
+				}else {
+					printf("Invalid include file: \"%s\", use <file> or \"file\"\n", token.lexeme);
+				}
+
 		//printf("FILE: %s\n", outputName);
 
-        include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
-        
 
+        include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
+
+				printf("Opening include file %s\n", outputName);
         yyin = fopen( outputName, "r" );
 
         if ( ! yyin )
@@ -84,8 +118,12 @@ void read_includes()
 
         yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
 	}
-	
+
 	reset(outputName);
+}
+
+int fileExists(char *filename){
+	return !access(filename, R_OK);
 }
 
 void read_define()
@@ -95,13 +133,13 @@ void read_define()
 	{
 		getToken();
 	}
-	
+
 	strgcpy(defineTable[cant_define][0], yytext);
 	//printf("Lexema %s\n", defineTable[cant_define][0]);
 	getToken();
 	//printf("Lexema %s\n", yytext);
-	//getToken();
-	
+
+
 	while(token.tokenId == SEPARATOR)
 	{
 		getToken();
@@ -121,7 +159,7 @@ void read_define()
 		{
 			strgcpy(defineTable[cant_define][1], yytext);
 			//printf("Reemplazo %s\n", yytext);
-		}	
+		}
 		getToken();
 	}
 	cant_define++;
@@ -132,7 +170,7 @@ void replace_define()
 	int i;
 	for(i = 0; i<cant_define; i++)
 	{
-		
+
 		if (strgcmp(yytext, defineTable[i][0]) != 0)
 		{
 			//printf("Lexema 1%s\n", defineTable[i][0]);
@@ -146,12 +184,12 @@ void replace_define()
 
 
 
-int preprocessor(void) 
+int preprocessor(void)
 {
 	getToken();
-	
-	outputName = malloc(20 * sizeof(char));
-	replacement = malloc(1000 * sizeof(char)); 
+
+	outputName = malloc(50 * sizeof(char));
+	replacement = malloc(1000 * sizeof(char));
 	reset(replacement);
 	int i, j;
 	for(i=0; i<ROWS; i++)
@@ -159,33 +197,33 @@ int preprocessor(void)
 		defineTable[i][0] = malloc(512 * sizeof(char));
 		defineTable[i][1] = malloc(2048 * sizeof(char));
 	}
-	
-	
+
+
 	FILE* out_file;
 	out_file = fopen("output.c", "w");
     yyout = out_file;
-	
-	while(token.tokenId) 
+
+	while(token.tokenId)
 	{
 		//printf("%s\n", token.tokenId);
 		if (token.tokenId == INCLUDE) //include found
 		{
-			getToken();                               
+			getToken();
 			read_includes();
-	        
+
 	    }
 	    if (token.tokenId == DEFINE) //define found
 		{
-			getToken();                               
+			getToken();
 			read_define();
-	        
+
 	    }
 	    if (token.tokenId == ID) //posible macro found
 		{
 			replace_define();
-	        
-	        
-		    
+
+
+
 	    }
 	    if(*replacement!='\0')
 	    {
@@ -196,14 +234,14 @@ int preprocessor(void)
 	    	fprintf(yyout, "%s ", yytext);
 		getToken();
 	    //printf("Token: %s\n", yytext);
-		
+
 		if (token.tokenId == 0)
 		{
 			if ( --include_stack_ptr < 0 )
 		    {
 		        break;
 		    }
-		
+
 		    else
 		    {
 		    	//printf("Deberia pasar por aqui");
@@ -214,7 +252,7 @@ int preprocessor(void)
 		    }
 		}
 	}
-	
+
 	fclose(out_file);
 	free(outputName);
 	return 0;
@@ -263,7 +301,7 @@ char *getTokenFamily(int tokenId){
 }
 
 
-int main(int argc, char **argv) 
+int main(int argc, char **argv)
 {
 
 	if(argc>0)
@@ -281,7 +319,7 @@ int main(int argc, char **argv)
 
 	cant_define = 0;
 	preprocessor();
-	
+
 	yyin = fopen( "output.c", "r" );
 
     if ( ! yyin )
@@ -292,16 +330,16 @@ int main(int argc, char **argv)
     /*FILE* out_file;
 	out_file = fopen("scannedFile.txt", "w");
     yyout = out_file;
-	
+
 	//getToken();
 	//currentLine = token.lineNo;
 	//system("rm latex/result.tex");
 	//copy(TEMPLATE_HEAD, BEAMER_FILE);
-	while(token.tokenId) 
+	while(token.tokenId)
 	{
-		
+
 		//while (currentLine == token.lineNo && token.tokenId){
-			
+
 			fprintf(yyout, "%s ", getTokenFamily(token.tokenId));
 			if (token.tokenId==100){
 				writeSeparator(token.lexeme);
@@ -309,7 +347,7 @@ int main(int argc, char **argv)
 				continue;
 			}
 			//printf("%s has id %d, is a lexeme from %s in line %d and is of family %s\n", token.lexeme, token.tokenId ,token.lexicalCategory, token.lineNo, token.CTokenFamily);
-			addToken(token); 
+			addToken(token);
 			getToken();
 		//}
 		//currentLine = token.lineNo;
@@ -318,18 +356,18 @@ int main(int argc, char **argv)
 	//writeStatistics();
 	//appendToFile(BEAMER_FILE, "\n\n\\end{document}");
 	//compileLatex();
-	
+
 	//yyterminate();
 	//fclose(out_file);
 	//fclose(yyin);
-	free(outputName);
+	//free(outputName);
 
 	yylineno = 1;
     yyin = fopen("output.c", "r");
-    
+
     extern int yydebug;
     yydebug = 0;
-    
+
     yyparse();
 
     fclose(yyin);

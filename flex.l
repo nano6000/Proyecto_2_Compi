@@ -11,6 +11,7 @@ IS  (((u|U)(l|L)?)|((l|L)(u|U)?))
 
 ID		    	[_a-zA-Z][_a-zA-Z0-9]*
 STRING		    \"(\\.|[^\\"])*\"
+SYSTEM_INCLUDE <(\\.|[^\\"])*>
 CHARACTER    	\'[^\n|\n]\'
 
 OCTAL  			[0-7]
@@ -123,6 +124,7 @@ COMMENT		    ("/*"[^*]*[*]+([^/*][^*]*[*]+)*[/])|"//".*
 
 "#include"               return INCLUDE;
 "#define"                return DEFINE;
+"#"
 
 
 {HEX_PREFIX}{HEXADECIMAL}+{IS}?								return CONSTANT;
@@ -134,12 +136,18 @@ COMMENT		    ("/*"[^*]*[*]+([^/*][^*]*[*]+)*[/])|"//".*
 {HEX_PREFIX}{HEXADECIMAL}+{P}{FS}?		 					return CONSTANT;
 {HEX_PREFIX}{HEXADECIMAL}*"."{HEXADECIMAL}+{P}{FS}?			return CONSTANT;
 
+
+
 {STRING}				return STRING;
 {CHARACTER}			    return CHARACTER;
+{SYSTEM_INCLUDE}		return SYSTEM_INCLUDE;
 {ID}					return ID;
 [ \t\n] 				return SEPARATOR;
 <<EOF>>    			    return 0;
 {COMMENT}				;
+
+
+
 .						{printf("TOKEN irreconocible %s en la linea: %d\n", yytext, yylineno);}
 
 %%
