@@ -6,26 +6,27 @@
 //#include "lex.yy.c"
 #define BETWEEN(value, min, max) (value <= max && value >= min)
 
-#define MAX_INCLUDE_DEPTH 10
+/*#define MAX_INCLUDE_DEPTH 10
 #define ROWS 512
 #define	COLUMNS 2
 YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
-int include_stack_ptr = 0;
+int include_stack_ptr = 0;*/
 
 extern int yylex();
 extern int yylineno;
 extern char* yytext;
 
 
-int currentLine;
+/*int currentLine;
 struct Token token;
 
 
 char *defineTable[ROWS][COLUMNS]; //tabla de macros y sus definiciones
 int cant_define;	//Cantidad de defines actualeas
 char* replacement; //varible que contiene la definicion de una macro especifica
+*/
 char* outputName;
-
+/*
 void rmQuote(char *d , char *s)
 {
 	if (*s=='"')
@@ -256,7 +257,7 @@ int preprocessor(void)
 	fclose(out_file);
 	free(outputName);
 	return 0;
-}
+}*/
 
 
 void compileLatex(){
@@ -318,7 +319,7 @@ int main(int argc, char **argv)
 	}
 
 	cant_define = 0;
-	preprocessor();
+	//preprocessor();
 
 	yyin = fopen( "output.c", "r" );
 

@@ -12,7 +12,7 @@ IS  (((u|U)(l|L)?)|((l|L)(u|U)?))
 ID		    	[_a-zA-Z][_a-zA-Z0-9]*
 STRING		    \"(\\.|[^\\"])*\"
 SYSTEM_INCLUDE <(\\.|[^\\"])*>
-CHARACTER    	\'[^\n|\n]\'
+CHARACTER    	'(\\.|.)+'
 
 OCTAL  			[0-7]
 DECIMAL   		[0-9]
@@ -139,7 +139,7 @@ COMMENT		    ("/*"[^*]*[*]+([^/*][^*]*[*]+)*[/])|"//".*
 
 
 {STRING}				return STRING;
-{CHARACTER}			    return CHARACTER;
+{CHARACTER}			    return CONSTANT;
 {SYSTEM_INCLUDE}		return SYSTEM_INCLUDE;
 {ID}					return ID;
 [ \t\n] 				return SEPARATOR;
