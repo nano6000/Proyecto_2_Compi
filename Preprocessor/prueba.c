@@ -1,1 +1,1 @@
-#include "prueba.h"
+#include <stdio.h>

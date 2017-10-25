@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include "lex.yy.c"
 
 #define MAX_INCLUDE_DEPTH 10
@@ -17,6 +18,12 @@ char *defineTable[ROWS][COLUMNS]; //tabla de macros y sus definiciones
 int cant_define;    //Cantidad de defines actualeas
 char* replacement; //varible que contiene la definicion de una macro especifica
 
+struct Token getToken(){
+    token.tokenId = yylex();
+    token.lexeme = yytext;
+    token.lineNo = yylineno;
+}
+
 void rmQuote(char *d , char *s)
 {
     if (*s=='"')
@@ -24,6 +31,17 @@ void rmQuote(char *d , char *s)
     while (*d++=*s++)
         if (*s=='"')
             s++;
+}
+
+void rmNewLine(char *d)
+{
+    while (*d++!='\n');
+    *--d='/';
+}
+
+void rmFirstChar(char *d)
+{
+    while (*d=*++d);
 }
 
 void rmSysIncludesChars(char *d , char *s){
@@ -56,13 +74,12 @@ void reset(char *d)
     while (*d++='\0');
 }
 
-void push_file(char * file)
+int push_file(int external)
 {
     
-    char *fullIncludePath = calloc(100, sizeof(char));
+    char *fullIncludePath = calloc(256, sizeof(char));
 
-
-    //printf("%s\n", token.lexeme);
+    printf("%s\n", yytext);
     //getToken();
 
     if ( include_stack_ptr >= MAX_INCLUDE_DEPTH )
@@ -71,31 +88,54 @@ void push_file(char * file)
         exit( 1 );
     }
 
-    FILE *includePaths = fopen("output.c", "r");
-    int count = 0;
-    if ( includePaths != NULL )
+    if(external)
     {
-        char line[256]; /* or other suitable maximum line size */
-        while (fgets(line, sizeof line, includePaths) != NULL) /* read a line */
+        FILE *includePaths = fopen("info.txt", "r");
+        if ( includePaths != NULL )
         {
-            strcpy(fullIncludePath, line);
-            strcat(fullIncludePath, file);
-            printf("Opening include file %s\n", outputName);
-            yyin = fopen( outputName, "r" );
+            char line[256]; /* or other suitable maximum line size */
+            while (fgets(line, sizeof line, includePaths) != NULL) /* read a line */
+            {
+                if(*line==' ')
+                {
+                    strcpy(fullIncludePath, line);
+                    rmNewLine(fullIncludePath);
+                    strcat(fullIncludePath, yytext);
 
-            if ( yyin )
-            {   
-                include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
-                yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
-                break;
+                    yyin = fopen( fullIncludePath+1, "r" );
+
+                    if ( yyin )
+                    {   
+                        include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
+                        yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
+                        printf("File opened: %s\n", fullIncludePath+1);
+                        break;
+                    }
+                }
             }
         }
+        fclose(includePaths);
     }
-    fclose(file);
+    else
+    {
+        yyin = fopen( yytext, "r" );
+
+        if ( yyin )
+        {   
+            include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
+            yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
+            printf("File opened: %s\n", yytext);
+        }
+        
+    }
 
 
     if( !yyin )
-        printf("Invalid include file: \"%s\", use <file> or \"file\"\n", token.lexeme);
+    {
+        printf("Invalid include file: \"%s\", use <file> or \"file\"\n", fullIncludePath);
+        return 0;
+    }
+    return 1;
     
 }
 
@@ -103,7 +143,7 @@ int fileExists(char *filename){
     return !access(filename, R_OK);
 }
 
-void read_define()
+/*void read_define()
 {
     int backslash = 0;
     while(token.tokenId == SEPARATOR)
@@ -157,21 +197,30 @@ void replace_define()
             break;
         }
     }
-}
+}*/
 
-struct Token getToken(){
-    token.tokenId = yylex();
-    token.lexeme = yytext;
-    token.lineNo = yylineno;
-}
-
-
-int main(void)
+int main(int argc, char **argv)
 {
+    system("(gcc -Wp,-v -x c++ - -fsyntax-only >& info.txt) & sleep 1; kill %%"); //obtiene los directorios en donde gcc busca los include
+
+    if(argc>0)
+    {
+        yyin = fopen( argv[1], "r" );
+
+        if ( ! yyin )
+        {
+            printf("No yyin\n");
+            return 1;
+        }
+
+        yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
+    }
+
     getToken();
 
-    outputName = malloc(50 * sizeof(char));
-    replacement = malloc(1000 * sizeof(char));
+
+    //outputName = malloc(50 * sizeof(char));
+    /*replacement = malloc(1000 * sizeof(char));
     reset(replacement);
     int i, j;
     for(i=0; i<ROWS; i++)
@@ -179,8 +228,6 @@ int main(void)
         defineTable[i][0] = malloc(512 * sizeof(char));
         defineTable[i][1] = malloc(2048 * sizeof(char));
     }
-
-    system("gcc -Wp,-v -x c++ - -fsyntax-only >> info.txt");
 
 
     FILE* out_file;
@@ -237,7 +284,7 @@ int main(void)
         }
     }
 
-    fclose(out_file);
-    free(outputName);
+    fclose(out_file);*/
+    //free(outputName);
     return 0;
 }
