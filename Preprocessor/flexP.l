@@ -12,11 +12,27 @@ void reset(char *);
 
 %x INCLUDE_FILE
 %x INCLUDE_FILE2
+%x DEFINE_MACRO
+%x DEFINE_MACRO2
+
+WORD			[_a-zA-Z][_a-zA-Z0-9]*
+COMMENT		    ("/*"[^*]*[*]+([^/*][^*]*[*]+)*[/])|"//".*
 
 %%
+
+
+<<EOF>> {
+			yyterminate ();
+        }
+
+
 ^"#"[ \t]*include[ \t]*[\"] { BEGIN INCLUDE_FILE; }
 
 ^"#"[ \t]*include[ \t]*[<] { BEGIN INCLUDE_FILE2; }
+
+^"#"[ \t]*define[ \t]* { BEGIN DEFINE_MACRO; }
+
+
 
 <INCLUDE_FILE>[^ \t\n\">]+  {
 								{
@@ -24,16 +40,18 @@ void reset(char *);
 
 									if(c!='"')
 									{
-									  fprintf (stderr, "Bad include line is found.\n");
+									  fprintf (stderr, "Bad include line is found. Missing \'\"\' character\n");
 
 									  yyterminate ();
 									}
 								}
 
-								if (!push_file (0))
+								push_file (0);
+
+								/*if (!push_file (0))
 								{
 									yyterminate ();
-								}
+								}*/
 
 								BEGIN INITIAL;
                         	}
@@ -44,16 +62,18 @@ void reset(char *);
 
 									if(c!='>')
 									{
-									  fprintf (stderr, "Bad include line is found.\n");
+									  fprintf (stderr, "Bad include line is found. Missing \'>\' character\n");
 
 									  yyterminate ();
 									}
 								}
 
-								if (!push_file (1))
+								push_file (1);
+
+								/*if (!push_file (1))
 								{
 									yyterminate ();
-								}
+								}*/
 
 								BEGIN INITIAL;
 							}
@@ -64,11 +84,20 @@ void reset(char *);
                      yyterminate ();
                    }
 
-<<EOF>> {
-			yyterminate ();
-        }
 
-. 			{ ECHO; }
+<DEFINE_MACRO>[^ \t\n]+  {
+								//printf("primero leo: %s\n", yytext);
+								read_define();
+								BEGIN INITIAL;
+                        	}
+
+
+
+{WORD}					return 1;
+[ \n\t]					return 100;
+. 						return 2;
+{COMMENT}				
+
 %%
 
 int yywrap(void)

@@ -5,3 +5,4 @@ struct Token {
 } Token;
 
 int push_file(int external);
+void read_define();

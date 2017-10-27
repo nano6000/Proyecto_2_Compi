@@ -4,7 +4,7 @@
 #include <string.h>
 #include "lex.yy.c"
 
-#define MAX_INCLUDE_DEPTH 10
+#define MAX_INCLUDE_DEPTH 100
 #define ROWS 512
 #define COLUMNS 2
 YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
@@ -15,6 +15,8 @@ struct Token token;
 
 
 char *defineTable[ROWS][COLUMNS]; //tabla de macros y sus definiciones
+char *includeRecord[ROWS]; //tabla de macros y sus definiciones
+int cantInclude;
 int cant_define;    //Cantidad de defines actualeas
 char* replacement; //varible que contiene la definicion de una macro especifica
 
@@ -62,7 +64,6 @@ void strgcpy(char *d , char *s)
 int strgcmp(char *d, char *s)
 {
     int i =0;
-    int state = 0;
     for (i = 0; d[i]!='\0'; i++)
         if (d[i]!=s[i])
             return 0;
@@ -78,9 +79,17 @@ int push_file(int external)
 {
     
     char *fullIncludePath = calloc(256, sizeof(char));
+    // int repeated = 0;
 
-    printf("%s\n", yytext);
+    //printf("%s\n", yytext);
     //getToken();
+
+    /*int i;
+    for(i=0; i<cantInclude; i++)
+    {
+        printf("-----------> %s, %i\n", includeRecord[i], i);
+        repeated |= strgcmp(yytext, includeRecord[i]);
+    }*/
 
     if ( include_stack_ptr >= MAX_INCLUDE_DEPTH )
     {
@@ -88,6 +97,10 @@ int push_file(int external)
         exit( 1 );
     }
 
+    /*if(!repeated)
+    {
+        
+    strcpy(includeRecord[cantInclude++], yytext);*/
     if(external)
     {
         FILE *includePaths = fopen("info.txt", "r");
@@ -108,7 +121,7 @@ int push_file(int external)
                     {   
                         include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
                         yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
-                        printf("File opened: %s\n", fullIncludePath+1);
+                        printf("File included: %s\n", fullIncludePath+1);
                         break;
                     }
                 }
@@ -118,64 +131,60 @@ int push_file(int external)
     }
     else
     {
-        yyin = fopen( yytext, "r" );
+        strcpy(fullIncludePath, yytext);
+        yyin = fopen( fullIncludePath, "r" );
 
         if ( yyin )
         {   
             include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
             yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
-            printf("File opened: %s\n", yytext);
+            printf("Local file included: %s\n", fullIncludePath);
         }
         
     }
-
 
     if( !yyin )
     {
         printf("Invalid include file: \"%s\", use <file> or \"file\"\n", fullIncludePath);
         return 0;
     }
+
+    //}
+
     return 1;
     
 }
 
-int fileExists(char *filename){
-    return !access(filename, R_OK);
-}
-
-/*void read_define()
+void read_define()
 {
     int backslash = 0;
-    while(token.tokenId == SEPARATOR)
-    {
-        getToken();
-    }
-
     strgcpy(defineTable[cant_define][0], yytext);
-    //printf("Lexema %s\n", defineTable[cant_define][0]);
+    
+    //printf("Lexema %s\n", yytext);
+    //printf("En tabla %s\n", defineTable[cant_define][0]);
+
+    BEGIN INITIAL;
+    
     getToken();
     //printf("Lexema %s\n", yytext);
+    //printf("Despues \"%s\"\n", yytext);
 
-
-    while(token.tokenId == SEPARATOR)
+    while(token.tokenId == 100)
     {
+        //printf("Lexema %s\n", yytext);
         getToken();
     }
-    while(*yytext != '\n' | backslash)
+    while(token.tokenId!=0 && (*yytext != '\n' | backslash))
     {
-        if (token.tokenId == BACKSLASH)
+        if (*yytext == '\\')
             backslash = 1;
         else if (*yytext == '\n')
             backslash = 0;
-        else if (*yytext == '\t')
-        {
-            getToken();
-            continue;
-        }
         else
         {
-            strgcpy(defineTable[cant_define][1], yytext);
-            //printf("Reemplazo %s\n", yytext);
+            strcat(defineTable[cant_define][1], yytext);
+            // printf("Reemplazo \"%s\"\n", yytext);
+            // printf("Reemplazo en tabla \"%s\"\n", defineTable[cant_define][1]);
         }
         getToken();
     }
@@ -197,7 +206,7 @@ void replace_define()
             break;
         }
     }
-}*/
+}
 
 int main(int argc, char **argv)
 {
@@ -213,14 +222,12 @@ int main(int argc, char **argv)
             return 1;
         }
 
-        yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
     }
 
-    getToken();
 
 
     //outputName = malloc(50 * sizeof(char));
-    /*replacement = malloc(1000 * sizeof(char));
+    replacement = malloc(1000 * sizeof(char));
     reset(replacement);
     int i, j;
     for(i=0; i<ROWS; i++)
@@ -229,12 +236,21 @@ int main(int argc, char **argv)
         defineTable[i][1] = malloc(2048 * sizeof(char));
     }
 
+    /*cantInclude = 0;
+    int i;
+    for(i=0; i<ROWS; i++)
+    {
+        includeRecord[i] = malloc(64 * sizeof(char));
+    }*/
 
     FILE* out_file;
     out_file = fopen("output.c", "w");
     yyout = out_file;
 
-    while(token.tokenId)
+
+    getToken();
+
+    /*while(token.tokenId)
     {
         //printf("%s\n", token.tokenId);
         if (token.tokenId == INCLUDE) //include found
@@ -282,9 +298,49 @@ int main(int argc, char **argv)
                 getToken();
             }
         }
+    }*/
+
+    while(token.tokenId)
+    {
+        //printf("%s\n", token.tokenId);
+        //printf("Token: %s\n", yytext);
+        if(token.tokenId==1)
+            replace_define();
+
+        if(*replacement!='\0')
+        {
+            fprintf(yyout, "%s", replacement);
+            reset(replacement);
+        }
+        else
+            fprintf(yyout, "%s", yytext);
+        
+        getToken();
+        //printf("1-Token: %i\n", token.tokenId);
+
+        if (token.tokenId == 0)
+        {
+            if ( --include_stack_ptr < 0 )
+            {
+                break;
+            }
+
+            else
+            {
+                //printf("Deberia pasar por aqui");
+                yy_delete_buffer( YY_CURRENT_BUFFER );
+                yy_switch_to_buffer(include_stack[include_stack_ptr] );
+                //printf("Token: %s\n", yytext);
+                getToken();
+            }
+        }
     }
 
-    fclose(out_file);*/
+    /*for(i=ROWS-1; i<=0; i--)
+    {
+        free(includeRecord[i]);
+    }*/
+    fclose(out_file);
     //free(outputName);
     return 0;
 }
