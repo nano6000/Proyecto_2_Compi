@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
-#include "scanner.h"
+#include "compiler.h"
 #include "parser.tab.c"
 //#include "beamerWrite.c"
 //#include "lex.yy.c"
@@ -17,11 +17,11 @@ extern int yylineno;
 extern char* yytext;
 
 
-/*int currentLine;
+int currentLine;
 struct Token token;
 
 
-char *defineTable[ROWS][COLUMNS]; //tabla de macros y sus definiciones
+/*char *defineTable[ROWS][COLUMNS]; //tabla de macros y sus definiciones
 int cant_define;	//Cantidad de defines actualeas
 char* replacement; //varible que contiene la definicion de una macro especifica
 */
@@ -307,24 +307,31 @@ int main(int argc, char **argv)
 
 	if(argc>0)
 	{
-		yyin = fopen( argv[1], "r" );
+		char* command = malloc(50*sizeof(char));
+		strcpy(command, "./prep ");
+		strcat(command, argv[1]);
+		//yyin = fopen( argv[1], "r" );
 
-	    if ( ! yyin )
+	    if (system(command) )
 	    {
-	        printf("No yyin\n");
-	        return 1;
+	        printf("Preprocessing error!\n");
+	        return 0;
 	    }
+	    free(command);
 
-	    yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
+	    //yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
 	}
 
-	cant_define = 0;
+	//cant_define = 0;
 	//preprocessor();
 
 	yyin = fopen( "output.c", "r" );
 
     if ( ! yyin )
+    {
         printf("No yyin\n");
+        return 0;
+    }
 
     yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
 
@@ -364,7 +371,7 @@ int main(int argc, char **argv)
 	//free(outputName);
 
 	yylineno = 1;
-    yyin = fopen("output.c", "r");
+    //yyin = fopen("output.c", "r");
 
     extern int yydebug;
     yydebug = 0;

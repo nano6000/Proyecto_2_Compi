@@ -1,7 +1,7 @@
 CC = gcc
 OBJS = preprocess.c
 FLEX = flexP.l
-OUT = prep
+OUT = ../prep
 
 compile: $(OBJS)
 	$(CC) -o $(OUT) $(OBJS) 

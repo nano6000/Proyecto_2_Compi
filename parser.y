@@ -37,7 +37,6 @@ primary_expression
 	| CONSTANT
 	| STRING
 	| LPARENTHESIS expression RPARENTHESIS	
-	| LPARENTHESIS error RPARENTHESIS { yyclearin; }
 	| generic_selection
 	;
 
@@ -464,7 +463,6 @@ labeled_statement
 compound_statement
 	: LBRACKET RBRACKET
 	| LBRACKET  block_item_list RBRACKET
-	| LBRACKET error RBRACKET { yyclearin; }
 	;
 
 block_item_list

@@ -1,8 +1,8 @@
 CC = gcc
-OBJS = scanner.c
+OBJS = compiler.c
 FLEX = flex.l
 BISON = parser.y
-OUT = pruebas/scan
+OUT = pruebas/compile
 
 compile: $(OBJS)
 	$(CC) -o $(OUT) $(OBJS) 
