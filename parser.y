@@ -189,7 +189,10 @@ constant_expression
 
 declaration
 	: declaration_specifiers SEMICOLON
+	| declaration_specifiers error { printf("Linea: %i. Se encontro '%s', cuando se esperaba ';'\n\n", yylineno, yytext);}
 	| declaration_specifiers init_declarator_list SEMICOLON
+	| declaration_specifiers init_declarator_list error { printf("Linea: %i. Se encontro '%s', cuando se esperaba ';'\n\n", yylineno, yytext);}
+	| declaration_specifiers error SEMICOLON { yyerrok;}
 	| static_assert_declaration
 	;
 
@@ -330,6 +333,7 @@ declarator
 
 direct_declarator
 	: ID
+	| error { printf("Linea: %i. Nombre de variable invalido: %s.\n\n", yylineno, yytext); }
 	| LPARENTHESIS declarator RPARENTHESIS
 	| direct_declarator LBRACE RBRACE
 	| direct_declarator LBRACE STAR RBRACE
@@ -542,7 +546,7 @@ void yyerror(const char *s)
 	    {
 	        if (count == yylineno-1)
 	        {
-	            printf("%s in line: %i\n-->  %s\n", s, yylineno, line);
+	            printf("-->  %s\n", line);
 	            break;
 	        }
 	        else

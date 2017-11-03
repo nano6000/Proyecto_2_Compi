@@ -1,2 +1,2 @@
-int main();
 
+static int = 4;
