@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <string.h>
+
 void funcion1(){
     int r=0,x,y=0,n         =             0     ;
                 char       v   [
@@ -61,7 +60,7 @@ int void_token(){
 }
 
 int flex_Token(){
-	char k, j=,d;
+	char j=,d;
 }
 
 // Programa que asigna números random a un arreglo de strings y lo imprime en pantalla.
@@ -327,7 +326,13 @@ int yywrap(){
     int count10 = 0; 				int count11 = 0; int count22 = 0; int count320 = 0; int count415 = 0; int count51 = 0; int count61 = 0;
     int count20 = 0; int count21 = 0; 					int count325 = 0; int count330 = 0; int count421 = 0; int count52 = 0; 				int count62 = 0;
     int count30 = 0; int count311 = 0; 				int count32 = 0; int count340 = 0; int count33 = 0; int count53 = 0; 						int count63 = 0;
-    int count40 = 0; 				int count411 = 0; int count525 = 0; int count350 = 0; int count44 = 0; int count54 = 0; int count64 = 0;
+    int count40 = 0;
+    int count411 = 0;
+    int count525 = 0; 
+    int count350 = 0; 
+    int count44 = 0; 
+    int count54 = 0; 
+    int count64 = 0;
     int count50 = 0; int count512 = 0; int count626 = 0; int count360 = 0; int count45 = 0; int count55 = 0; int count65 = 0;
 }
 

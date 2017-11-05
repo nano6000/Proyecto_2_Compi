@@ -1,2 +1,2 @@
 
-static int = 4;
+int  = 1, b = 2;

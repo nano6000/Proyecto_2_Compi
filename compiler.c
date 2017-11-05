@@ -277,9 +277,6 @@ char *getTokenFamily(int tokenId){
 	if (tokenId == CONSTANT){
 		return "CONSTANT";
 	}
-	else if(tokenId == INCLUDE){
-		return "INCLUDE";
-	}
 	else if (tokenId == STRING){
 		return "STRING";
 	}

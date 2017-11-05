@@ -143,12 +143,9 @@ extern int yydebug;
     CARET = 353,
     PIPE = 354,
     QUESTION_MARK = 355,
-    INCLUDE = 356,
-    DEFINE = 357,
-    CHARACTER = 358,
-    SEPARATOR = 359,
-    QOUTE = 360,
-    SYSTEM_INCLUDE = 361
+    CHARACTER = 356,
+    SEPARATOR = 357,
+    QOUTE = 358
   };
 #endif
 

@@ -24,9 +24,8 @@ void yyerror(const char *s);
 
 %token SEMICOLON LPARENTHESIS RPARENTHESIS LBRACE RBRACE COMMA COLON
 %token EQUALS LBRACKET RBRACKET DOT AMPERSAND EXCLAMATION MINUS PLUS TILDE
-%token STAR SLASH BACKSLASH MODULO LESS_THAN GREATER_THAN CARET PIPE QUESTION_MARK INCLUDE
-%token DEFINE CHARACTER SEPARATOR QOUTE
-%token SYSTEM_INCLUDE
+%token STAR SLASH BACKSLASH MODULO LESS_THAN GREATER_THAN CARET PIPE QUESTION_MARK
+%token CHARACTER SEPARATOR QOUTE
 
 %start translation_unit
 %define parse.error verbose
@@ -193,6 +192,7 @@ declaration
 	| declaration_specifiers init_declarator_list SEMICOLON
 	| declaration_specifiers init_declarator_list error { printf("Linea: %i. Se encontro '%s', cuando se esperaba ';'\n\n", yylineno, yytext);}
 	| declaration_specifiers error SEMICOLON { yyerrok;}
+	| error SEMICOLON { yyerrok; }
 	| static_assert_declaration
 	;
 
@@ -212,10 +212,12 @@ declaration_specifiers
 init_declarator_list
 	: init_declarator
 	| init_declarator_list COMMA init_declarator
+	| error COMMA init_declarator { printf("Expresion invalida antes de ','\n\n"); }
 	;
 
 init_declarator
 	: declarator EQUALS initializer
+	| declarator initializer { yyerror(""); fprintf(stderr, "Linea: %i. Falta signo '='.\n\n", yylineno, yytext); YYERROR; }
 	| declarator
 	;
 
@@ -546,7 +548,7 @@ void yyerror(const char *s)
 	    {
 	        if (count == yylineno-1)
 	        {
-	            printf("-->  %s\n", line);
+	            printf("-->  %s<< %s >>\n", line, s);
 	            break;
 	        }
 	        else

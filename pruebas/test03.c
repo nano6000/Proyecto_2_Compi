@@ -1,5 +1,4 @@
-#include <stdlib.h>
-#include <string.h>
+#include <test.h>
 
 
 typedef enum {
@@ -286,9 +285,6 @@ int **global_matrix;
 
 
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 
                      static signed char a[] = {0x69,
                    110, 118, 97, 108, 105,  0x64, 1-1,
@@ -458,7 +454,6 @@ void BubbleSort()
      return;   //arrays are passed to functions by address; nothing is returned
 }
 
-#include "scanner.h"
 
 void count(){
     int row = 0;

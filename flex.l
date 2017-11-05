@@ -11,7 +11,6 @@ IS  (((u|U)(l|L)?)|((l|L)(u|U)?))
 
 ID		    	[_a-zA-Z][_a-zA-Z0-9]*
 STRING		    \"(\\.|[^\\"])*\"
-SYSTEM_INCLUDE <(\\.|[^\\"])*>
 CHARACTER    	'(\\.|.)+'
 
 OCTAL  			[0-7]
@@ -122,9 +121,6 @@ COMMENT		    ("/*"[^*]*[*]+([^/*][^*]*[*]+)*[/])|"//".*
 "|"						return PIPE;
 "?"						return QUESTION_MARK;
 
-"#include"               return INCLUDE;
-"#define"                return DEFINE;
-"#"
 
 
 {HEX_PREFIX}{HEXADECIMAL}+{IS}?								return CONSTANT;
@@ -140,7 +136,6 @@ COMMENT		    ("/*"[^*]*[*]+([^/*][^*]*[*]+)*[/])|"//".*
 
 {STRING}				return STRING;
 {CHARACTER}			    return CONSTANT;
-{SYSTEM_INCLUDE}		return SYSTEM_INCLUDE;
 {ID}					return ID;
 [ \t\n] 				return SEPARATOR;
 <<EOF>>    			    return 0;
