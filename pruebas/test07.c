@@ -1,6 +1,4 @@
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+
 
                      static signed char a[] = {0x69,
                    110, 118, 97, 108, 105,  0x64, 1-1,

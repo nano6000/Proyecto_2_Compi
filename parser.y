@@ -36,11 +36,14 @@ primary_expression
 	| CONSTANT
 	| STRING
 	| LPARENTHESIS expression RPARENTHESIS	
+	| LPARENTHESIS expression error { printf("Linea: %i. Caracter ')' faltante\n\n", yylineno); yyerrok;}
+	| LPARENTHESIS error RPARENTHESIS { printf("Linea: %i. Expresion invalida\n\n", yylineno); yyerrok;}
 	| generic_selection
 	;
 
 generic_selection
 	: GENERIC LPARENTHESIS assignment_expression COMMA generic_assoc_list RPARENTHESIS
+	| GENERIC LPARENTHESIS error RPARENTHESIS { printf("Linea: %i. Expresion invalida antes de '%s'\n\n", yylineno, yytext); yyerrok;}
 	;
 
 generic_assoc_list
@@ -69,6 +72,7 @@ postfix_expression
 argument_expression_list
 	: assignment_expression
 	| argument_expression_list COMMA assignment_expression
+	| argument_expression_list COMMA error { printf("Linea: %i. Expresion invalida despues de ','\n\n", yylineno); yyerrok; }
 	;
 
 unary_expression
@@ -105,57 +109,74 @@ multiplicative_expression
 additive_expression
 	: multiplicative_expression
 	| additive_expression PLUS multiplicative_expression
+	| additive_expression PLUS error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
 	| additive_expression MINUS multiplicative_expression
+	| additive_expression MINUS error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
 	;
 
 shift_expression
 	: additive_expression
 	| shift_expression SHL additive_expression
 	| shift_expression SHR additive_expression
+	| shift_expression SHL error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
+	| shift_expression SHR error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
 	;
 
 relational_expression
 	: shift_expression
 	| relational_expression LESS_THAN shift_expression
 	| relational_expression GREATER_THAN shift_expression
+	| relational_expression LESS_THAN error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
+	| relational_expression GREATER_THAN error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
 	| relational_expression LE_OP shift_expression
 	| relational_expression GE_OP shift_expression
+	| relational_expression LE_OP error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
+	| relational_expression GE_OP error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
 	;
 
 equality_expression
 	: relational_expression
 	| equality_expression EQ_OP relational_expression
 	| equality_expression NE_OP relational_expression
+	| equality_expression EQ_OP error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
+	| equality_expression NE_OP error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
 	;
 
 and_expression
 	: equality_expression
 	| and_expression AMPERSAND equality_expression
+	| and_expression AMPERSAND error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
 	;
 
 exclusive_or_expression
 	: and_expression
 	| exclusive_or_expression CARET and_expression
+	| exclusive_or_expression CARET error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
 	;
 
 inclusive_or_expression
 	: exclusive_or_expression
 	| inclusive_or_expression PIPE exclusive_or_expression
+	| inclusive_or_expression PIPE error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
 	;
 
 logical_and_expression
 	: inclusive_or_expression
 	| logical_and_expression AND_OP inclusive_or_expression
+	| logical_and_expression AND_OP error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
 	;
 
 logical_or_expression
 	: logical_and_expression
 	| logical_or_expression OR_OP logical_and_expression
+	| logical_or_expression OR_OP error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
 	;
 
 conditional_expression
 	: logical_or_expression
 	| logical_or_expression QUESTION_MARK expression COLON conditional_expression
+	| logical_or_expression QUESTION_MARK expression COLON error { printf("Linea: %i. Expresion faltante antes de: %s\n\n", yylineno, yytext); yyerrok; }
+	| error QUESTION_MARK expression COLON conditional_expression { printf("Linea: %i. Expresion faltante antes de: '?'\n\n", yylineno, yytext); yyerrok; }
 	;
 
 assignment_expression
@@ -207,6 +228,7 @@ declaration_specifiers
 	| function_specifier
 	| alignment_specifier declaration_specifiers
 	| alignment_specifier
+	| error {printf("Linea: %i. Tipo de variable invalida.\n\n", yylineno); yyclearin; }
 	;
 
 init_declarator_list
@@ -217,6 +239,7 @@ init_declarator_list
 
 init_declarator
 	: declarator EQUALS initializer
+	| declarator EQUALS error { fprintf(stderr, "Linea: %i. Expresion inesperada antes de '%s'.\n\n", yylineno, yytext); yyerrok; }
 	| declarator initializer { yyerror(""); fprintf(stderr, "Linea: %i. Falta signo '='.\n\n", yylineno, yytext); YYERROR; }
 	| declarator
 	;
@@ -484,6 +507,7 @@ block_item
 expression_statement
 	: SEMICOLON
 	| expression SEMICOLON
+	| expression error { printf("Linea: %i. Falta ';'\n\n", yylineno); yyerrok; }
 	;
 
 selection_statement

@@ -2,6 +2,7 @@
 //#include "token.h"
 
 #include "parser.tab.h"
+void imprimirLinea();
 %}
 %option yylineno
 
@@ -143,11 +144,41 @@ COMMENT		    ("/*"[^*]*[*]+([^/*][^*]*[*]+)*[/])|"//".*
 
 
 
-.						{printf("TOKEN irreconocible %s en la linea: %d\n", yytext, yylineno);}
+.						{ imprimirLinea(); printf("TOKEN irreconocible %s en la linea: %d\n", yytext, yylineno);}
 
 %%
 
 int yywrap(void)
 {
 	return 1;
+}
+
+void imprimirLinea()
+{
+	//printf("%s in line: %i, lexeme: %s\n", s, yylineno, yytext);
+
+
+	FILE *file = fopen("output.c", "r");
+	int count = 0;
+	if ( file != NULL )
+	{
+	    char line[256]; /* or other suitable maximum line size */
+	    while (fgets(line, sizeof line, file) != NULL) /* read a line */
+	    {
+	        if (count == yylineno-1)
+	        {
+	            printf("-->  %s\n\n", line);
+	            break;
+	        }
+	        else
+	        {
+	            count++;
+	        }
+	    }
+	    fclose(file);
+	}
+	else
+	{
+	    printf("Error al reportar el error");
+	}
 }
