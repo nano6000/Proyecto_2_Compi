@@ -1,30 +1,30 @@
 #include "semanticStack.h"
 
 
-STACK newStack(void){
-    STACK tl = malloc(sizeof(struct List));
-    if (tl)
-    {
-       tl->tail_pred = (NODE)&tl->head;
-       tl->tail = 0;
-       tl->head = (NODE)&tl->tail;
-       return tl;
+LIST newList(void){
+    LIST stack = malloc(sizeof(struct List));
+    if (stack){
+
+       stack->tail_pred = (NODE)&stack->head;
+       stack->tail = 0;
+       stack->head = (NODE)&stack->tail;
+       return stack;
     }
     return 0;
 }
 
-int isEmpty(STACK l){
+int isEmpty(LIST l){
    return (l->head->succ == 0);
 }
 
 
 
-NODE GET_TOP(STACK l){
+NODE GET_TOP(LIST l){
   return l->tail_pred;
 }
 
 
-NODE PUSH(STACK l, NODE n){
+NODE PUSH(LIST l, NODE n){
     n->succ = (NODE)&l->tail;
     n->pred = l->tail_pred;
     l->tail_pred->succ = n;
@@ -34,7 +34,7 @@ NODE PUSH(STACK l, NODE n){
 
 
 
-NODE POP(STACK l){
+NODE POP(LIST l){
    NODE t;
    t = l->tail_pred;
    l->tail_pred = l->tail_pred->pred;
@@ -43,7 +43,7 @@ NODE POP(STACK l){
 }
 
 
-NODE removeNode(STACK l, NODE n){
+NODE removeNode(LIST l, NODE n){
    n->pred->succ = n->succ;
    n->succ->pred = n->pred;
    return n;
@@ -78,7 +78,7 @@ struct SemanticRecord *createIDSR(char *IDStr){
   IDDataBlock->id = calloc (strlen(IDStr), sizeof(char));
   SR->tag = _ID;
   strcpy(IDDataBlock->id, IDStr);
-  printf("INside createIDSR, id = %s", IDDataBlock->id);
+  SR->DataBlock = IDDataBlock;
   return SR;
 }
 
@@ -106,32 +106,76 @@ void freeSemanticRecord (struct SemanticRecord *semanticRecord){
 }
 
 
-int main()
-{
-    STACK semanticStack;
-    struct SemanticRecord *SR;
+int main(){
+  LIST symTableStack;
+  symTableStack = newList();
 
-    semanticStack = newStack();
-    if (semanticStack)
-    {
-      SR = createTypeSR("char");
-      if (SR){
+  /*tabla de símbolos*/
+  LIST symbolTable;
+  symbolTable = newList();
 
-        PUSH(semanticStack, (NODE)SR);
+  /*Nodo que va a ir dentro de symTableStack*/
+  struct SymbolTable *tablaGlobal = malloc(sizeof(struct SymbolTable));
+  tablaGlobal->symbols = symbolTable;
 
-        struct SemanticRecord *TOP = (struct SemanticRecord*)GET_TOP(semanticStack);
-        if (TOP){
-          printf("Got top right\n");
-        }
-        struct Type *myType = (struct Type*)TOP->DataBlock;
-        if (myType){
-          printf("Got id right\n");
-        }
-        printf("Tag is %d\nType is %s\n", TOP->tag, myType->type);
-        //freeSemanticRecord(TOP);
-        //POP(semanticStack);
-      }
+  /*Un símbolo, que es un nodo dentro de la tabla de símbolos*/
+  struct SymbolRecord *symbol = malloc(sizeof(struct SymbolRecord));
+  symbol->id = "kontador";
+  symbol->tipo = "ihnt";
 
-      free(semanticStack);
-    }
+
+  PUSH(tablaGlobal->symbols, (NODE)symbol);
+  PUSH(symTableStack, (NODE)tablaGlobal);
+
+  struct SymbolTable *tabla = (struct SymbolTable *)POP(symTableStack);
+  struct SymbolRecord *simbolo = (struct SymbolRecord *)POP(tabla->symbols);
+  printf("El símbolo tiene id: %s y tipo: %s\n", simbolo->id, simbolo->tipo);
+
+
 }
+
+
+// int main()
+// {
+//     LIST semanticStack;
+//     struct SemanticRecord *SR;
+//     struct SemanticRecord *SR2;
+//
+//     semanticStack = newList();
+//     if (semanticStack)
+//     {
+//       SR = createTypeSR("char");
+//       SR2 = createIDSR("contador");
+//       if (SR){
+//
+//         PUSH(semanticStack, (NODE)SR);
+//         PUSH(semanticStack, (NODE)SR2);
+//
+//         struct SemanticRecord *TOP = (struct SemanticRecord*)POP(semanticStack);
+//         struct SemanticRecord *TOP2 = (struct SemanticRecord*)POP(semanticStack);
+//
+//
+//         if (TOP){
+//           printf("Top tag is %d\n", TOP->tag);
+//         }
+//         struct ID *myID = (struct ID*)TOP->DataBlock;
+//         if (myID){
+//
+//           printf("Id is %s\n", myID->id);
+//         }
+//
+//
+//       if (TOP2){
+//         printf("Top2 tag is %d\n", TOP2->tag);
+//       }
+//       struct Type *myType = (struct Type*)TOP2->DataBlock;
+//       if (myType){
+//
+//         printf("Type is %s\n", myType->type);
+//       }
+//       free(semanticStack);
+//       freeSemanticRecord(TOP);
+//       freeSemanticRecord(TOP2);
+//     }
+//   }
+// }
