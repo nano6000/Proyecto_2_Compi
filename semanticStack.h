@@ -37,7 +37,7 @@ struct SymbolTable{
 struct SymbolRecord{
   struct MNode node;
   char *id;
-  char *tipo;
+  char *type;
 };
 
 /*Block de datos para el RS tipo type*/
@@ -92,7 +92,7 @@ NODE removeNode(LIST, NODE);
 
 
 /*
-** NODE rn = RETRIEVE (LIST l, char *tag)
+** NODE rn = RETRIEVE (LIST l, int tag)
 ** Returns the first node in the list which matches tag
 */
-NODE RETRIEVE (LIST, NODE);
+struct SemanticRecord *RETRIEVE_SR (LIST, int tag);

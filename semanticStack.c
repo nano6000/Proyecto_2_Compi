@@ -17,7 +17,15 @@ int isEmpty(LIST l){
    return (l->head->succ == 0);
 }
 
-
+/**/
+struct SemanticRecord *RETRIEVE_SR(LIST list, int tag){
+  struct SemanticRecord *RS = (struct SemanticRecord *)GET_TOP(list);
+  while (!isEmpty(list)){
+    if(RS->tag == tag) return RS;
+    RS = (struct SemanticRecord *)RS->node.pred;
+  }
+  return 0;
+}
 
 NODE GET_TOP(LIST l){
   return l->tail_pred;
@@ -106,76 +114,184 @@ void freeSemanticRecord (struct SemanticRecord *semanticRecord){
 }
 
 
-int main(){
-  LIST symTableStack;
-  symTableStack = newList();
+/*Crea una tabla de símbolos con una lista de símbolos*/
+struct SymbolTable *newSymbolTable(){
+  struct SymbolTable *table = malloc(sizeof(struct SymbolTable));
+  if (table){
+    LIST symbols = newList();
+    if (symbols){
+      table->symbols = symbols;
+      return table;
+    }
+  }
+  return 0;
+}
 
-  /*tabla de símbolos*/
-  LIST symbolTable;
-  symbolTable = newList();
-
-  /*Nodo que va a ir dentro de symTableStack*/
-  struct SymbolTable *tablaGlobal = malloc(sizeof(struct SymbolTable));
-  tablaGlobal->symbols = symbolTable;
-
-  /*Un símbolo, que es un nodo dentro de la tabla de símbolos*/
+struct SymbolRecord *newSymbolRecord(char* type, char* id){
   struct SymbolRecord *symbol = malloc(sizeof(struct SymbolRecord));
-  symbol->id = "kontador";
-  symbol->tipo = "ihnt";
-
-
-  PUSH(tablaGlobal->symbols, (NODE)symbol);
-  PUSH(symTableStack, (NODE)tablaGlobal);
-
-  struct SymbolTable *tabla = (struct SymbolTable *)POP(symTableStack);
-  struct SymbolRecord *simbolo = (struct SymbolRecord *)POP(tabla->symbols);
-  printf("El símbolo tiene id: %s y tipo: %s\n", simbolo->id, simbolo->tipo);
-
-
+  symbol->type = type;
+  symbol->id = id;
+  return symbol;
 }
 
 
-// int main()
-// {
-//     LIST semanticStack;
-//     struct SemanticRecord *SR;
-//     struct SemanticRecord *SR2;
+
+
+// int main(){
+//   LIST SymbolTableStack;
+//   SymbolTableStack = newList();
 //
-//     semanticStack = newList();
-//     if (semanticStack)
-//     {
-//       SR = createTypeSR("char");
-//       SR2 = createIDSR("contador");
-//       if (SR){
-//
-//         PUSH(semanticStack, (NODE)SR);
-//         PUSH(semanticStack, (NODE)SR2);
-//
-//         struct SemanticRecord *TOP = (struct SemanticRecord*)POP(semanticStack);
-//         struct SemanticRecord *TOP2 = (struct SemanticRecord*)POP(semanticStack);
+//   PUSH(SymbolTableStack, (NODE)newSymbolTable());
 //
 //
-//         if (TOP){
-//           printf("Top tag is %d\n", TOP->tag);
-//         }
-//         struct ID *myID = (struct ID*)TOP->DataBlock;
-//         if (myID){
+//   /*Un símbolo, que es un nodo dentro de la tabla de símbolos*/
+//   struct SymbolTable *table = (struct SymbolTable *)GET_TOP(SymbolTableStack);
+//   struct SymbolRecord *symbol = newSymbolRecord("int*", "myIntPointer");
+//   PUSH(table->symbols, (NODE)symbol);
+//   symbol = newSymbolRecord("int2*", "myIntPointer2");
+//   PUSH(table->symbols, (NODE)symbol);
+//   symbol = newSymbolRecord("int3*", "myIntPointer3");
+//   PUSH(table->symbols, (NODE)symbol);
 //
-//           printf("Id is %s\n", myID->id);
-//         }
 //
+//   struct SymbolTable *tabla = (struct SymbolTable *)POP(SymbolTableStack);
+//   struct SymbolRecord *simbolo = (struct SymbolRecord *)POP(tabla->symbols);
+//   printf("El símbolo tiene id: %s y tipo: %s\n", simbolo->id, simbolo->type);
 //
-//       if (TOP2){
-//         printf("Top2 tag is %d\n", TOP2->tag);
-//       }
-//       struct Type *myType = (struct Type*)TOP2->DataBlock;
-//       if (myType){
+//   simbolo = (struct SymbolRecord *)POP(tabla->symbols);
+//   printf("El símbolo tiene id: %s y tipo: %s\n", simbolo->id, simbolo->type);
 //
-//         printf("Type is %s\n", myType->type);
-//       }
-//       free(semanticStack);
-//       freeSemanticRecord(TOP);
-//       freeSemanticRecord(TOP2);
-//     }
-//   }
+//   simbolo = (struct SymbolRecord *)POP(tabla->symbols);
+//   printf("El símbolo tiene id: %s y tipo: %s\n", simbolo->id, simbolo->type);
+//
 // }
+
+
+int pruebaSR0()
+{
+    LIST semanticStack;
+    struct SemanticRecord *SR;
+    struct SemanticRecord *SR2;
+
+    semanticStack = newList();
+    if (semanticStack)
+    {
+      SR = createTypeSR("char");
+      SR2 = createIDSR("contador");
+      if (SR){
+
+        PUSH(semanticStack, (NODE)SR);
+        PUSH(semanticStack, (NODE)SR2);
+
+        struct SemanticRecord *TOP = (struct SemanticRecord*)POP(semanticStack);
+        struct SemanticRecord *TOP2 = (struct SemanticRecord*)POP(semanticStack);
+
+
+        if (TOP){
+          printf("Top tag is %d\n", TOP->tag);
+        }
+        struct ID *myID = (struct ID*)TOP->DataBlock;
+        if (myID){
+
+          printf("Id is %s\n", myID->id);
+        }
+
+
+      if (TOP2){
+        printf("Top2 tag is %d\n", TOP2->tag);
+      }
+      struct Type *myType = (struct Type*)TOP2->DataBlock;
+      if (myType){
+
+        printf("Type is %s\n", myType->type);
+      }
+
+    }
+  }
+  return 0;
+}
+
+
+int pruebaSemanticStack0(){
+    LIST semanticStack;
+    struct SemanticRecord *SR;
+    struct SemanticRecord *SR2;
+
+    semanticStack = newList();
+    if (semanticStack)
+    {
+      SR = createTypeSR("char");
+      SR2 = createIDSR("contador");
+      if (SR){
+
+        PUSH(semanticStack, (NODE)SR);
+        PUSH(semanticStack, (NODE)SR2);
+
+        struct SemanticRecord *TOP = (struct SemanticRecord*)POP(semanticStack);
+        struct SemanticRecord *TOP2 = (struct SemanticRecord*)POP(semanticStack);
+
+
+        if (TOP){
+          printf("Top tag is %d\n", TOP->tag);
+        }
+        struct ID *myID = (struct ID*)TOP->DataBlock;
+        if (myID){
+
+          printf("Id is %s\n", myID->id);
+        }
+
+
+      if (TOP2){
+        printf("Top2 tag is %d\n", TOP2->tag);
+      }
+      struct Type *myType = (struct Type*)TOP2->DataBlock;
+      if (myType){
+
+        printf("Type is %s\n", myType->type);
+      }
+
+    }
+  }
+  return 0;
+}
+
+int pruebaRetrieve0(){
+  LIST semanticStack;
+  struct SemanticRecord *SR;
+  struct SemanticRecord *SR2;
+  struct SemanticRecord *SR3;
+  struct SemanticRecord *SR4;
+
+  semanticStack = newList();
+  if (semanticStack){
+    SR = createTypeSR("charSR");
+    SR2 = createIDSR("contadorSR2");
+    SR3 = createIDSR("contadorSR3");
+    SR4 = createIDSR("contadorSR4");
+
+    if (SR){
+      PUSH(semanticStack, (NODE)SR);
+      PUSH(semanticStack, (NODE)SR2);
+      PUSH(semanticStack, (NODE)SR3);
+      PUSH(semanticStack, (NODE)SR4);
+      struct SemanticRecord *test = (struct SemanticRecord *)RETRIEVE_SR(semanticStack, 1);
+      if (test){
+        printf("Retrieved tag is %d\n", test->tag);
+        if (test->tag == 2){
+          struct Type *type = (struct Type *)test->DataBlock;
+          printf("Tag 2 is type, so, value of type is %s\n",type->type);
+        }
+        else if(test->tag == 1){
+          struct ID *id = (struct ID *)test->DataBlock;
+          printf("Tag 1 is ID, so, value of id is %s\n",id->id);
+        }
+      }
+    }
+  }
+  return 0;
+}
+
+int main(){
+  pruebaRetrieve0();
+  return 0;
+}
