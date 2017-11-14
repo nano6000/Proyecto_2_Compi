@@ -1,5 +1,5 @@
 CC = gcc
-OBJS = preprocess.c semanticStack.c
+OBJS = preprocess.c
 FLEX = flexP.l
 OUT = ../pruebas/prep
 

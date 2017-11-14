@@ -9,3 +9,7 @@ int escribirSalida(char* inst);
 
 
 void inicio_if();
+void fin_if();
+void inicio_else();
+void process_literal(char* text);
+void process_id(char* text);

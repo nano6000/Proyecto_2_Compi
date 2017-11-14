@@ -7,6 +7,7 @@
 #define _DO 3
 #define _TOKEN 4
 #define _IF 5
+#define _LITERAL 6
 
 
 struct List {
@@ -51,11 +52,12 @@ struct ID{
 };
 
 struct IFS{
-  char *begin_label;
+  char *else_label;
   char *exit_label;
 };
 
 struct DO{
+  int type;
   char *data;
 };
 

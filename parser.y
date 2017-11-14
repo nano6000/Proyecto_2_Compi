@@ -1,7 +1,6 @@
 %{
 #include "lex.yy.c"
 #include "compiler.h"
-#include "semanticStack.h"
 void yyerror(const char *s);
 
 %}
@@ -35,7 +34,7 @@ void yyerror(const char *s);
 
 primary_expression
 	: ID
-	| CONSTANT
+	| { process_literal(yytext); } CONSTANT
 	| STRING
 	| LPARENTHESIS expression RPARENTHESIS	
 	| LPARENTHESIS expression error { printf("Linea: %i. Caracter ')' faltante\n\n", yylineno); yyerrok;}
@@ -183,7 +182,7 @@ conditional_expression
 
 assignment_expression
 	: conditional_expression
-	| unary_expression assignment_operator assignment_expression
+	| { process_id(yytext); } unary_expression assignment_operator assignment_expression 
 	;
 
 assignment_operator
@@ -201,7 +200,7 @@ assignment_operator
 	;
 
 expression
-	: assignment_expression
+	: assignment_expression 
 	| expression COMMA assignment_expression
 	;
 
@@ -510,10 +509,11 @@ expression_statement
 	: SEMICOLON
 	| expression SEMICOLON
 	| expression error { printf("Linea: %i. Falta ';'\n\n", yylineno); yyerrok; }
+	| error SEMICOLON { printf("Linea: %i. Expresion invalida.\n\n", yylineno); yyerrok; }
 	;
 
 selection_statement
-	: IF LPARENTHESIS expression RPARENTHESIS { inicio_if(); } statement else_block
+	: IF LPARENTHESIS expression RPARENTHESIS { inicio_if(); } statement { inicio_else(); } else_block { fin_if(); }
 	| SWITCH LPARENTHESIS expression RPARENTHESIS statement
 	;
 
@@ -564,7 +564,6 @@ declaration_list
 
 extern int yylineno;
 extern char* yytext;
-extern LIST semanticStack;
 
 void yyerror(const char *s)
 {
@@ -596,29 +595,3 @@ void yyerror(const char *s)
 	}
 }
 
-void inicio_if()
-{
-	struct SemanticRecord *RSIF;
-	RSIF = createIFSR();
-	PUSH(semanticStack, (NODE)RSIF);
-
-	struct IFS *type = (struct IFS *)RSIF->DataBlock;
-
-	char* inst = malloc(50*sizeof(char));
-	strcpy(inst, "jz ");
-	strcat(inst, type->begin_label);
-	escribirSalida(inst);
-
-	free(inst);
-}
-
-void fin_if()
-{
-	char* exit_label = generarLabels(0);
-	char* inst = malloc(50*sizeof(char));
-	strcpy(inst, "jz ");
-	strcat(inst, exit_label);
-	escribirSalida(inst);
-
-	free(inst);
-}
