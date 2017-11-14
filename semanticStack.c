@@ -1,4 +1,5 @@
 #include "semanticStack.h"
+#include "compiler.h"
 
 
 LIST newList(void){
@@ -87,6 +88,20 @@ struct SemanticRecord *createIDSR(char *IDStr){
   SR->tag = _ID;
   strcpy(IDDataBlock->id, IDStr);
   SR->DataBlock = IDDataBlock;
+  return SR;
+}
+
+struct SemanticRecord *createIFSR(){
+  struct SemanticRecord *SR = malloc(sizeof(struct SemanticRecord));
+  struct IFS *IFDataBlock = malloc(sizeof(struct IFS));
+
+  IFDataBlock->begin_label = calloc (15, sizeof(char));
+  IFDataBlock->exit_label = calloc (15, sizeof(char));
+
+  SR->tag = _IF;
+  strcpy(IDDataBlock->begin_label, generarLabels(0));
+  strcpy(IDDataBlock->exit_label, generarLabels(0));
+  SR->DataBlock = IFDataBlock;
   return SR;
 }
 

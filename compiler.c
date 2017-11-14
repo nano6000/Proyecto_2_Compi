@@ -2,302 +2,23 @@
 #include <unistd.h>
 #include "compiler.h"
 #include "parser.tab.c"
-//#include "beamerWrite.c"
-//#include "lex.yy.c"
-#define BETWEEN(value, min, max) (value <= max && value >= min)
+#include "semanticStack.h"
 
-/*#define MAX_INCLUDE_DEPTH 10
-#define ROWS 512
-#define	COLUMNS 2
-YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
-int include_stack_ptr = 0;*/
+#define BETWEEN(value, min, max) (value <= max && value >= min)
 
 extern int yylex();
 extern int yylineno;
 extern char* yytext;
 
+int numTemp;
+
+LIST semanticStack;
 
 int currentLine;
-struct Token token;
 
-
-/*char *defineTable[ROWS][COLUMNS]; //tabla de macros y sus definiciones
-int cant_define;	//Cantidad de defines actualeas
-char* replacement; //varible que contiene la definicion de una macro especifica
-*/
 char* outputName;
-/*
-void rmQuote(char *d , char *s)
-{
-	if (*s=='"')
-		s++;
-	while (*d++=*s++)
-		if (*s=='"')
-			s++;
-}
 
-void rmSysIncludesChars(char *d , char *s){
-	if (*s=='<')
-		s++;
-	while (*d++=*s++)
-		if (*s=='>')
-			s++;
-}
-
-
-void strgcpy(char *d , char *s)
-{
-	while (*d++);
-	for (--d;*d++=*s++;);
-}
-
-int strgcmp(char *d, char *s)
-{
-	int i =0;
-	int state = 0;
-	for (i = 0; d[i]!='\0'; i++)
-		if (d[i]!=s[i])
-			return 0;
-	return 1;
-}
-
-void reset(char *d)
-{
-	while (*d++='\0');
-}
-
-void read_includes()
-{
-	while(token.tokenId == SEPARATOR)
-	{
-		getToken();
-	}
-	char *fullIncludePath = calloc(100, sizeof(char));
-
-
-	//printf("%s\n", token.lexeme);
-	//getToken();
-
-	if (token.tokenId == STRING || token.tokenId == SYSTEM_INCLUDE)
-	{
-
-		if ( include_stack_ptr >= MAX_INCLUDE_DEPTH )
-        {
-            fprintf( stderr, "Includes nested too deeply" );
-            exit( 1 );
-        }
-
-				if (token.tokenId == SYSTEM_INCLUDE){
-					rmSysIncludesChars(outputName, token.lexeme);
-					int i = 0;
-					int size = includePathsSize;
-					for(i = 0; i < size;i++){
-						strcpy(fullIncludePath, includePaths[i]);
-						strcat(fullIncludePath, outputName);
-						if (fileExists(fullIncludePath)){
-							outputName[0] = '\0';
-							strcpy(outputName, fullIncludePath);
-							break;
-						}
-					}
-				}else if (token.tokenId == STRING){
-					rmQuote(outputName, token.lexeme);
-				}else {
-					printf("Invalid include file: \"%s\", use <file> or \"file\"\n", token.lexeme);
-				}
-
-		//printf("FILE: %s\n", outputName);
-
-
-        include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
-
-				printf("Opening include file %s\n", outputName);
-        yyin = fopen( outputName, "r" );
-
-        if ( ! yyin )
-            printf("No yyin\n");
-
-        yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
-	}
-
-	reset(outputName);
-}
-
-int fileExists(char *filename){
-	return !access(filename, R_OK);
-}
-
-void read_define()
-{
-	int backslash = 0;
-	while(token.tokenId == SEPARATOR)
-	{
-		getToken();
-	}
-
-	strgcpy(defineTable[cant_define][0], yytext);
-	//printf("Lexema %s\n", defineTable[cant_define][0]);
-	getToken();
-	//printf("Lexema %s\n", yytext);
-
-
-	while(token.tokenId == SEPARATOR)
-	{
-		getToken();
-	}
-	while(*yytext != '\n' | backslash)
-	{
-		if (token.tokenId == BACKSLASH)
-			backslash = 1;
-		else if (*yytext == '\n')
-			backslash = 0;
-		else if (*yytext == '\t')
-		{
-			getToken();
-			continue;
-		}
-		else
-		{
-			strgcpy(defineTable[cant_define][1], yytext);
-			//printf("Reemplazo %s\n", yytext);
-		}
-		getToken();
-	}
-	cant_define++;
-}
-
-void replace_define()
-{
-	int i;
-	for(i = 0; i<cant_define; i++)
-	{
-
-		if (strgcmp(yytext, defineTable[i][0]) != 0)
-		{
-			//printf("Lexema 1%s\n", defineTable[i][0]);
-			//printf("Lexema 2%s\n", yytext);
-			strgcpy(replacement, defineTable[i][1]);
-			//printf("Lexema %s\n", replacement);
-			break;
-		}
-	}
-}
-
-
-
-int preprocessor(void)
-{
-	getToken();
-
-	outputName = malloc(50 * sizeof(char));
-	replacement = malloc(1000 * sizeof(char));
-	reset(replacement);
-	int i, j;
-	for(i=0; i<ROWS; i++)
-	{
-		defineTable[i][0] = malloc(512 * sizeof(char));
-		defineTable[i][1] = malloc(2048 * sizeof(char));
-	}
-
-
-	FILE* out_file;
-	out_file = fopen("output.c", "w");
-    yyout = out_file;
-
-	while(token.tokenId)
-	{
-		//printf("%s\n", token.tokenId);
-		if (token.tokenId == INCLUDE) //include found
-		{
-			getToken();
-			read_includes();
-
-	    }
-	    if (token.tokenId == DEFINE) //define found
-		{
-			getToken();
-			read_define();
-
-	    }
-	    if (token.tokenId == ID) //posible macro found
-		{
-			replace_define();
-
-
-
-	    }
-	    if(*replacement!='\0')
-	    {
-	    	fprintf(yyout, "%s ", replacement);
-	        reset(replacement);
-	    }
-	    else
-	    	fprintf(yyout, "%s ", yytext);
-		getToken();
-	    //printf("Token: %s\n", yytext);
-
-		if (token.tokenId == 0)
-		{
-			if ( --include_stack_ptr < 0 )
-		    {
-		        break;
-		    }
-
-		    else
-		    {
-		    	//printf("Deberia pasar por aqui");
-		        yy_delete_buffer( YY_CURRENT_BUFFER );
-		        yy_switch_to_buffer(include_stack[include_stack_ptr] );
-		        //printf("Token: %s\n", yytext);
-		        getToken();
-		    }
-		}
-	}
-
-	fclose(out_file);
-	free(outputName);
-	return 0;
-}*/
-
-
-void compileLatex(){
-	//system("pdflatex latex/result.tex && evince result.pdf -f" );
-}
-
-
-struct Token getToken(){
-	token.tokenId = yylex();
-	token.lexicalCategory = names[token.tokenId];
-	token.CTokenFamily = getTokenFamily(token.tokenId);
-	token.lexeme = yytext;
-	token.lineNo = yylineno;
-}
-
-char *getTokenFamily(int tokenId){
-	if (tokenId == CONSTANT){
-		return "CONSTANT";
-	}
-	else if (tokenId == STRING){
-		return "STRING";
-	}
-	else if (tokenId == ID){
-		return "ID";
-	}
-	else if (tokenId <= 34){
-		return "KEYWORD";
-	}
-	else if (BETWEEN(tokenId, 35, 62)){
-		return "OPERATOR";
-	}
-	else if (BETWEEN(tokenId, 63, 78)){
-		return "PUNCTUATOR";
-	}
-	else if (token.tokenId == 100){
-		return yytext;
-	}
-	return "\n";
-}
-
+FILE* out_file;
 
 int main(int argc, char **argv)
 {
@@ -307,7 +28,6 @@ int main(int argc, char **argv)
 		char* command = malloc(50*sizeof(char));
 		strcpy(command, "./prep ");
 		strcat(command, argv[1]);
-		//yyin = fopen( argv[1], "r" );
 
 	    if (system(command) )
 	    {
@@ -315,13 +35,7 @@ int main(int argc, char **argv)
 	        return 0;
 	    }
 	    free(command);
-
-	    //yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
 	}
-
-	//cant_define = 0;
-	//preprocessor();
-
 	yyin = fopen( "output.c", "r" );
 
     if ( ! yyin )
@@ -332,50 +46,83 @@ int main(int argc, char **argv)
 
     yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
 
-    /*FILE* out_file;
-	out_file = fopen("scannedFile.txt", "w");
-    yyout = out_file;
-
-	//getToken();
-	//currentLine = token.lineNo;
-	//system("rm latex/result.tex");
-	//copy(TEMPLATE_HEAD, BEAMER_FILE);
-	while(token.tokenId)
-	{
-
-		//while (currentLine == token.lineNo && token.tokenId){
-
-			fprintf(yyout, "%s ", getTokenFamily(token.tokenId));
-			if (token.tokenId==100){
-				writeSeparator(token.lexeme);
-				getToken();
-				continue;
-			}
-			//printf("%s has id %d, is a lexeme from %s in line %d and is of family %s\n", token.lexeme, token.tokenId ,token.lexicalCategory, token.lineNo, token.CTokenFamily);
-			addToken(token);
-			getToken();
-		//}
-		//currentLine = token.lineNo;
-	}*/
-	//beamerEndCCode();
-	//writeStatistics();
-	//appendToFile(BEAMER_FILE, "\n\n\\end{document}");
-	//compileLatex();
-
-	//yyterminate();
-	//fclose(out_file);
-	//fclose(yyin);
-	//free(outputName);
-
 	yylineno = 1;
-    //yyin = fopen("output.c", "r");
 
     extern int yydebug;
     yydebug = 0;
 
+    numTemp = 0;
+    outputName = malloc(15*sizeof(char));
+    strcpy(outputName, "assembler.asm");
+
+    out_file = fopen(outputName, "w");
+
+    semanticStack = newList();
+
     yyparse();
 
     fclose(yyin);
+    fclose(out_file);
     yyterminate();
+
+    generarTemporales(1);
+    generarLabels(1);
 	return 0;
 }
+
+char* generarTemporales(int borrar)
+{
+	static int numTemp = 0;
+	static char *nombre_variable;
+	if (borrar)
+	{
+		free(nombre_variable);
+		return "";
+	}
+	if(!nombre_variable)
+		nombre_variable = malloc(15*sizeof(char));
+
+	strcpy(nombre_variable, "temp0000");
+
+	int i;
+	for(i = 0 ; i<4 ; i++)
+	{
+		*(nombre_variable+7-i) = (numTemp%10) + '0';
+		numTemp /= 10 * (i+1);
+	}
+
+	numTemp++;
+	return nombre_variable;
+}
+
+char* generarLabels(int borrar)
+{
+	static int numLbl = 0;
+	static char *nombre_label;
+	if (borrar)
+	{
+		free(nombre_label);
+		return "";
+	}
+	if(!nombre_label)
+		nombre_label = malloc(15*sizeof(char));
+	
+	strcpy(nombre_label, "label0000");
+
+	int i;
+	for(i = 0 ; i<4 ; i++)
+	{
+		*(nombre_label+8-i) = (numLbl%10) + '0';
+		numLbl /= 10 * (i+1);
+	}
+
+	numLbl++;
+	return nombre_label;
+
+}
+
+int escribirSalida(char* inst)
+{
+	fprintf(out_file, inst);
+}
+

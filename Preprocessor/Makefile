@@ -1,7 +1,7 @@
 CC = gcc
-OBJS = preprocess.c
+OBJS = preprocess.c semanticStack.c
 FLEX = flexP.l
-OUT = ../prep
+OUT = ../pruebas/prep
 
 compile: $(OBJS)
 	$(CC) -o $(OUT) $(OBJS) 

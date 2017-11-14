@@ -6,6 +6,7 @@
 #define _TYPE 2
 #define _DATA_OBJECT 3
 #define _TOKEN 4
+#define _IF 5
 
 
 struct List {
@@ -49,6 +50,10 @@ struct ID{
   char *id;
 };
 
+struct IFS{
+  char *begin_label;
+  char *exit_label;
+};
 
 typedef struct MNode *NODE;
 typedef struct List *LIST;
@@ -96,3 +101,11 @@ NODE removeNode(LIST, NODE);
 ** Returns the first node in the list which matches tag
 */
 struct SemanticRecord *RETRIEVE_SR (LIST, int tag);
+
+
+struct SymbolRecord *newSymbolRecord(char* type, char* id);
+struct SymbolTable *newSymbolTable();
+void freeSemanticRecord (struct SemanticRecord *semanticRecord);
+struct SemanticRecord *createIFSR();
+struct SemanticRecord *createIDSR(char *IDStr);
+struct SemanticRecord *createTypeSR(char *typeStr);

@@ -1,5 +1,7 @@
 %{
 #include "lex.yy.c"
+#include "compiler.h"
+#include "semanticStack.h"
 void yyerror(const char *s);
 
 %}
@@ -511,9 +513,13 @@ expression_statement
 	;
 
 selection_statement
-	: IF LPARENTHESIS expression RPARENTHESIS statement ELSE statement
-	| IF LPARENTHESIS expression RPARENTHESIS statement
+	: IF LPARENTHESIS expression RPARENTHESIS { inicio_if(); } statement else_block
 	| SWITCH LPARENTHESIS expression RPARENTHESIS statement
+	;
+
+else_block
+	: ELSE statement
+	| %empty
 	;
 
 iteration_statement
@@ -558,6 +564,8 @@ declaration_list
 
 extern int yylineno;
 extern char* yytext;
+extern LIST semanticStack;
+
 void yyerror(const char *s)
 {
 	//printf("%s in line: %i, lexeme: %s\n", s, yylineno, yytext);
@@ -586,4 +594,31 @@ void yyerror(const char *s)
 	{
 	    printf("Error al reportar el error");
 	}
+}
+
+void inicio_if()
+{
+	struct SemanticRecord *RSIF;
+	RSIF = createIFSR();
+	PUSH(semanticStack, (NODE)RSIF);
+
+	struct IFS *type = (struct IFS *)RSIF->DataBlock;
+
+	char* inst = malloc(50*sizeof(char));
+	strcpy(inst, "jz ");
+	strcat(inst, type->begin_label);
+	escribirSalida(inst);
+
+	free(inst);
+}
+
+void fin_if()
+{
+	char* exit_label = generarLabels(0);
+	char* inst = malloc(50*sizeof(char));
+	strcpy(inst, "jz ");
+	strcat(inst, exit_label);
+	escribirSalida(inst);
+
+	free(inst);
 }

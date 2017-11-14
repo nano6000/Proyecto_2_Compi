@@ -236,69 +236,12 @@ int main(int argc, char **argv)
         defineTable[i][1] = malloc(2048 * sizeof(char));
     }
 
-    /*cantInclude = 0;
-    int i;
-    for(i=0; i<ROWS; i++)
-    {
-        includeRecord[i] = malloc(64 * sizeof(char));
-    }*/
-
     FILE* out_file;
     out_file = fopen("output.c", "w");
     yyout = out_file;
 
 
     getToken();
-
-    /*while(token.tokenId)
-    {
-        //printf("%s\n", token.tokenId);
-        if (token.tokenId == INCLUDE) //include found
-        {
-            getToken();
-            read_includes();
-
-        }
-        if (token.tokenId == DEFINE) //define found
-        {
-            getToken();
-            read_define();
-
-        }
-        if (token.tokenId == ID) //posible macro found
-        {
-            replace_define();
-
-
-
-        }
-        if(*replacement!='\0')
-        {
-            fprintf(yyout, "%s ", replacement);
-            reset(replacement);
-        }
-        else
-            fprintf(yyout, "%s ", yytext);
-        getToken();
-        //printf("Token: %s\n", yytext);
-
-        if (token.tokenId == 0)
-        {
-            if ( --include_stack_ptr < 0 )
-            {
-                break;
-            }
-
-            else
-            {
-                //printf("Deberia pasar por aqui");
-                yy_delete_buffer( YY_CURRENT_BUFFER );
-                yy_switch_to_buffer(include_stack[include_stack_ptr] );
-                //printf("Token: %s\n", yytext);
-                getToken();
-            }
-        }
-    }*/
 
     while(token.tokenId)
     {
