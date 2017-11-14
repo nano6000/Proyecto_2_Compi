@@ -1,11 +1,12 @@
-ignoring nonexistent directory "/usr/lib/gcc/x86_64-pc-linux-gnu/7.2.0/../../../../x86_64-pc-linux-gnu/include"
+clang -cc1 version 9.0.0 (clang-900.0.38) default target x86_64-apple-darwin16.7.0
+ignoring nonexistent directory "/usr/include/c++/v1"
 #include "..." search starts here:
 #include <...> search starts here:
- /usr/lib/gcc/x86_64-pc-linux-gnu/7.2.0/../../../../include/c++/7.2.0
- /usr/lib/gcc/x86_64-pc-linux-gnu/7.2.0/../../../../include/c++/7.2.0/x86_64-pc-linux-gnu
- /usr/lib/gcc/x86_64-pc-linux-gnu/7.2.0/../../../../include/c++/7.2.0/backward
- /usr/lib/gcc/x86_64-pc-linux-gnu/7.2.0/include
+ /Library/Developer/CommandLineTools/usr/include/c++/v1
  /usr/local/include
- /usr/lib/gcc/x86_64-pc-linux-gnu/7.2.0/include-fixed
+ /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include
+ /Library/Developer/CommandLineTools/usr/include
  /usr/include
+ /System/Library/Frameworks (framework directory)
+ /Library/Frameworks (framework directory)
 End of search list.
