@@ -41,12 +41,13 @@ void yyerror(const char *s);
 
 %%
 
+
 saveType
-	: %empty {printf("\t--Type: %s\n", yytext); saveTypeAS(yytext);}
+	: %empty { saveTypeAS(yytext);}
 	;
 
 save_pointer
-	: %empty {printf("\t--Pointer: %s\n", yytext); /*GetTop, which is a Type, add "*"" to it*/ savePointerAS();}
+	: %empty { savePointerAS();}
 
 primary_expression
 	: ID { printf("%s\n", $1);}
@@ -73,6 +74,11 @@ generic_association
 	| DEFAULT COLON assignment_expression
 	;
 
+postfix_expression2
+  : RBRACKET {closeContext();}
+  | COMMA RBRACKET {closeContext();}
+  ;
+
 postfix_expression
 	: primary_expression
 	| postfix_expression LBRACE expression RBRACE
@@ -82,8 +88,7 @@ postfix_expression
 	| postfix_expression PTR_OP ID
 	| postfix_expression INC_OP
 	| postfix_expression DEC_OP
-	| LPARENTHESIS type_name RPARENTHESIS LBRACKET initializer_list RBRACKET
-	| LPARENTHESIS type_name RPARENTHESIS LBRACKET initializer_list COMMA RBRACKET
+	| LPARENTHESIS type_name RPARENTHESIS LBRACKET {openNewContext();} initializer_list postfix_expression2
 	;
 
 argument_expression_list
@@ -198,7 +203,7 @@ conditional_expression
 
 assignment_expression
 	: conditional_expression
-	| unary_expression { printf("aqui entra\n"); } assignment_operator assignment_expression 
+	| unary_expression { printf("aqui entra\n"); } assignment_operator assignment_expression
 	;
 
 assignment_operator
@@ -216,7 +221,7 @@ assignment_operator
 	;
 
 expression
-	: assignment_expression 
+	: assignment_expression
 	| expression COMMA assignment_expression
 	;
 
@@ -226,9 +231,9 @@ constant_expression
 
 
 declaration2
-	:SEMICOLON
+	: SEMICOLON
 	| error { printf("Linea: %i. Se encontro '%s', cuando se esperaba ';'\n\n", yylineno, yytext);}
-	| init_declarator_list SEMICOLON
+	| init_declarator_list {declaration_end();} SEMICOLON
 	| init_declarator_list error { printf("Linea: %i. Se encontro '%s', cuando se esperaba ';'\n\n", yylineno, yytext);}
 	| error SEMICOLON { yyerrok;}
 	;
@@ -297,8 +302,8 @@ type_specifier
 	;
 
 struct_or_union_specifier
-	: struct_or_union LBRACKET struct_declaration_list RBRACKET
-	| struct_or_union ID LBRACKET struct_declaration_list RBRACKET
+	: struct_or_union LBRACKET {openNewContext();} struct_declaration_list RBRACKET {closeContext();}
+	| struct_or_union ID LBRACKET {openNewContext();} struct_declaration_list RBRACKET {closeContext();}
 	| struct_or_union ID
 	;
 
@@ -336,11 +341,15 @@ struct_declarator
 	| declarator
 	;
 
+enum_specifier2
+  : RBRACKET {closeContext();}
+  | COMMA RBRACKET {closeContext();}
+  ;
+
+
 enum_specifier
-	: ENUM LBRACKET enumerator_list RBRACKET
-	| ENUM LBRACKET enumerator_list COMMA RBRACKET
-	| ENUM ID LBRACKET enumerator_list RBRACKET
-	| ENUM ID LBRACKET enumerator_list COMMA RBRACKET
+	: ENUM LBRACKET {openNewContext();} enumerator_list enum_specifier2
+	| ENUM ID LBRACKET {openNewContext();} enumerator_list enum_specifier2
 	| ENUM ID
 	;
 
@@ -380,10 +389,17 @@ declarator
 	| direct_declarator
 	;
 
+
+
+direct_declarator2
+  : parameter_type_list RPARENTHESIS
+  | RPARENTHESIS
+  | ID_list RPARENTHESIS
+
 direct_declarator
-	: ID {printf("\t--ID: %s\n", $1); saveIDAS($1);}
+	: ID {saveIDAS($1);}
 	| error { printf("Linea: %i. Nombre de variable invalido: %s.\n\n", yylineno, yytext); }
-	| LPARENTHESIS declarator RPARENTHESIS
+	| LPARENTHESIS declarator RPARENTHESIS {printf("Here's a ( declarator  )\n");}
 	| direct_declarator LBRACE RBRACE
 	| direct_declarator LBRACE STAR RBRACE
 	| direct_declarator LBRACE STATIC type_qualifier_list assignment_expression RBRACE
@@ -393,9 +409,7 @@ direct_declarator
 	| direct_declarator LBRACE type_qualifier_list assignment_expression RBRACE
 	| direct_declarator LBRACE type_qualifier_list RBRACE
 	| direct_declarator LBRACE assignment_expression RBRACE
-	| direct_declarator LPARENTHESIS parameter_type_list RPARENTHESIS
-	| direct_declarator LPARENTHESIS RPARENTHESIS
-	| direct_declarator LPARENTHESIS ID_list RPARENTHESIS
+	| direct_declarator LPARENTHESIS { POP(getSemanticStack());} direct_declarator2
 	;
 
 pointer
@@ -422,9 +436,9 @@ parameter_list
 	;
 
 parameter_declaration
-	: saveType declaration_specifiers declarator
-	| saveType declaration_specifiers abstract_declarator
-	| saveType declaration_specifiers
+	: saveType declaration_specifiers declarator {declaration_end();}
+	| saveType declaration_specifiers abstract_declarator {declaration_end();}
+	| saveType declaration_specifiers {declaration_end();}
 	;
 
 
@@ -468,9 +482,13 @@ direct_abstract_declarator
 	| direct_abstract_declarator LPARENTHESIS parameter_type_list RPARENTHESIS
 	;
 
+initializer2
+  : RBRACKET {closeContext();}
+  | COMMA RBRACKET {closeContext();}
+  ;
+
 initializer
-	: LBRACKET initializer_list RBRACKET
-	| LBRACKET initializer_list COMMA RBRACKET
+	: LBRACKET {openNewContext();} initializer2
 	| assignment_expression
 	;
 
@@ -515,8 +533,8 @@ labeled_statement
 	;
 
 compound_statement
-	: LBRACKET RBRACKET
-	| LBRACKET  block_item_list RBRACKET
+	: LBRACKET {openNewContext();} RBRACKET {closeContext();}
+	| LBRACKET {openNewContext();}  block_item_list RBRACKET {closeContext();}
 	;
 
 block_item_list
@@ -572,10 +590,13 @@ external_declaration
 	: function_definition
 	| declaration
 	;
+function_definition2
+  : declarator declaration_list compound_statement
+  | declarator compound_statement
+
 
 function_definition
-	: saveType declaration_specifiers declarator declaration_list compound_statement
-	| saveType declaration_specifiers declarator compound_statement
+	: declaration_specifiers function_definition2
 	;
 
 declaration_list
@@ -618,4 +639,3 @@ void yyerror(const char *s)
 	    printf("Error al reportar el error");
 	}
 }
-

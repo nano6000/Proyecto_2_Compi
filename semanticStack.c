@@ -170,8 +170,12 @@ struct SymbolTable *newSymbolTable(){
 /*Crea un registro de símbolo con su tipo y id*/
 struct SymbolRecord *newSymbolRecord(char* type, char* id){
   struct SymbolRecord *symbol = malloc(sizeof(struct SymbolRecord));
-  symbol->type = type;
-  symbol->id = id;
+  char *newType = malloc(strlen(type)*sizeof(char));
+  char *newId = malloc(strlen(id)*sizeof(char));
+  strcpy(newType, type);
+  strcpy(newId, id);
+  symbol->type = newType;
+  symbol->id = newId;
   return symbol;
 }
 
@@ -184,11 +188,12 @@ LIST getSemanticStack(){
   return stack;
 }
 
-/*Retorna la statick pila de tablas de símbolos */
+/*Retorna la static pila de tablas de símbolos */
 LIST getSymbolTableStack(){
   static LIST symbolTable;
   if (!symbolTable){
     symbolTable = newList();
+    PUSH(symbolTable, (NODE)newSymbolTable());
   }
   return symbolTable;
 }
@@ -217,6 +222,82 @@ void savePointerAS(){
 
   PUSH(PS, (NODE)SR);
 
+}
+
+/*Retorna 1 si la variable ha sido declarada*/
+int symbolExistsGeneral(char * lookup){
+  LIST STS = getSymbolTableStack();
+  struct SymbolTable * ST = (struct SymbolTable *)GET_TOP(STS);
+  while(ST){
+    LIST symbols = ST->symbols;
+    struct SymbolRecord * symbol = (struct SymbolRecord *)GET_TOP(symbols);
+      while (symbol){
+        if (!strcmp(symbol->id, lookup)){
+          return 1;
+        }
+        symbol = (struct SymbolRecord *)symbol->node.pred;
+      }
+      ST = (struct SymbolTable *)ST->node.pred;
+    }
+    printf("Symbol %s hasn't been declared\n", lookup);
+    return 0;
+}
+
+/*Retorna 1 si la variable ya ha sido declarada*/
+int symbolExistsCurrentContext(char * lookup){
+  LIST STS = getSymbolTableStack();
+  struct SymbolTable * ST = (struct SymbolTable *)GET_TOP(STS);
+  LIST symbols = ST->symbols;
+  struct SymbolRecord * symbol = (struct SymbolRecord *)GET_TOP(symbols);
+    while (symbol){
+      if (!strcmp(symbol->id, lookup)){
+        printf("Symbol %s was already declarated in this context. Previous declaration is type %s\n", symbol->id, symbol->type);
+        return 1;
+      }
+      symbol = (struct SymbolRecord *)symbol->node.pred;
+    }
+    return 0;
+}
+
+void declaration_end(){
+  LIST PS = getSemanticStack();
+  LIST STS = getSymbolTableStack();
+  struct SymbolTable * ST = (struct SymbolTable *)GET_TOP(STS);
+  struct SemanticRecord * TypeSR = RETRIEVE_SR(PS,_TYPE);
+  struct Type * typeDataBlock = (struct Type *)TypeSR->DataBlock;
+
+  struct SemanticRecord * IDSR = (struct SemanticRecord *)GET_TOP(PS);
+  while(IDSR->tag == _ID){
+
+    struct ID * IDDataBlock = (struct ID *)IDSR->DataBlock;
+    printf("Checking type %s id %s in SymbolTable...\n", typeDataBlock->type, IDDataBlock->id);
+    symbolExistsCurrentContext(IDDataBlock->id);
+    struct SymbolRecord *symbol = newSymbolRecord(typeDataBlock->type, IDDataBlock->id);
+    PUSH(ST->symbols, (NODE)symbol);
+    struct SemanticRecord * TOP = (struct SemanticRecord *)IDSR->node.pred;
+    POP(PS);
+    freeSemanticRecord(IDSR);
+    IDSR = TOP;
+  }
+  POP(PS);
+}
+
+void openNewContext(){
+  LIST STS = getSymbolTableStack();
+  struct SymbolTable * ST = newSymbolTable();
+  PUSH(STS, (NODE)ST);
+}
+
+void closeContext(){
+  LIST STS = getSymbolTableStack();
+  struct SymbolTable * ST = (struct SymbolTable *)POP(STS);
+  LIST symbols = ST->symbols;
+  while(!isEmpty(symbols)){
+    struct SymbolRecord *symbol = (struct SymbolRecord *)POP(symbols);
+    free(symbol->id);
+    free(symbol->type);
+    free(symbol);
+  }
 }
 
 int SymbolTableStackTest(){

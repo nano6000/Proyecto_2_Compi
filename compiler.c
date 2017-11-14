@@ -23,7 +23,22 @@ FILE* out_file;
 int main(int argc, char **argv)
 {
 
-	if(argc>0)
+	if(argc == 1){
+		printf("\n\t--Compiladores e Intérpretes, gr40, IIS 2017--\n\nNo se especificó archivo de entrada. Uso: \n    ./compile <fuente.c>\n    ./compile -h  ->  ver la ayuda\n");
+		return -1;
+	}
+	else if(argc == 2){
+		if (!strcmp(argv[1], "-h")){
+			printf("\n\t--Compiladores e Intérpretes, gr40, IIS 2017--\n\nUso: \n    ./compile <fuente.c>\n    ./compile -h  ->  ver la ayuda\n");
+			return 0;
+		}
+	}
+	else if(argc > 2){
+		printf("\n\t--Compiladores e Intérpretes, gr40, IIS 2017--\n\nDemasiados Argumentos!\n\nUso: \n    ./compile <fuente.c>\n    ./compile -h  ->  ver la ayuda");
+		return -1
+	}
+
+	if(1)
 	{
 		char* command = malloc(50*sizeof(char));
 		strcpy(command, "./prep ");
@@ -123,7 +138,7 @@ char* generarLabels(int borrar)
 	}
 	if(!nombre_label)
 		nombre_label = malloc(15*sizeof(char));
-	
+
 	strcpy(nombre_label, "label0000");
 
 	int i;
@@ -198,7 +213,7 @@ void inicio_else()
 	free(inst);
 }
 
-void process_literal (char* text) 
+void process_literal (char* text)
 {
 	struct SemanticRecord *RSDO;
 	RSDO = createDOSR(_LITERAL, text);
@@ -206,7 +221,7 @@ void process_literal (char* text)
 	printf("Literal: %s\n", text);
 }
 
-void process_id (char* text) 
+void process_id (char* text)
 {
 	struct SemanticRecord *RSDO;
 	RSDO = createDOSR(_ID, text);
@@ -216,8 +231,6 @@ void process_id (char* text)
 
 	/*if(!lookup_TS(id))
 		rs.type = ERROR;
-	else 
+	else
 		rs.name = id;*/
 }
-
-

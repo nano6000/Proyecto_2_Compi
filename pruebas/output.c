@@ -1,14 +1,44 @@
 
 
+void printAll(n, p){
+	int n;
+	char p;
+	return 0;
+}
+
+int main ()
+{
+	int j;
+	int a, b, c, d;
+	if(2==2)
+	{
+		int j;
+		if(3==2){
+			char j;
+			j = 'b';
+			int j;
+			int j;
+		}
+		else
+			j = 5;
+	}
+}
 
 
-int main(int *argc, char **argv){
-  char a;
-  int b;
-  int c, d, e, f;
-  int *b;
-  return 0;
-  int w = main();
-  w += 35;
-  int w = 32;
+int f(char x, char p)
+{
+	int a = 0;
+	return a;
+}
+
+int g()
+{
+	int a = 0;
+	return a;
+}
+
+int h()
+{
+	int a = 0;
+	return a;
 }
