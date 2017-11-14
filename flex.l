@@ -1,6 +1,5 @@
 %{
-//#include "token.h"
-
+#include <string.h>
 #include "parser.tab.h"
 void imprimirLinea();
 %}
@@ -137,9 +136,9 @@ COMMENT		    ("/*"[^*]*[*]+([^/*][^*]*[*]+)*[/])|"//".*
 
 {STRING}				return STRING;
 {CHARACTER}			    return CONSTANT;
-{ID}					return ID;
+{ID}					yylval.str_t = strdup(yytext); return ID;
 [ \t\n] 				return SEPARATOR;
-<<EOF>>    			    return 0;
+<<EOF>>    			    free(yyval.str_t); return 0;
 {COMMENT}				;
 
 

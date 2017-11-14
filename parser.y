@@ -1,5 +1,6 @@
 %{
 #include "lex.yy.c"
+#include "compiler.h"
 void yyerror(const char *s);
 
 
@@ -49,7 +50,7 @@ save_pointer
 
 primary_expression
 	: ID
-	| CONSTANT
+	| { process_literal(yytext); } CONSTANT
 	| STRING
 	| LPARENTHESIS expression RPARENTHESIS
 	| LPARENTHESIS expression error { printf("Linea: %i. Caracter ')' faltante\n\n", yylineno); yyerrok;}
@@ -197,7 +198,7 @@ conditional_expression
 
 assignment_expression
 	: conditional_expression
-	| unary_expression assignment_operator assignment_expression
+	| { process_id(yytext); } unary_expression assignment_operator assignment_expression 
 	;
 
 assignment_operator
@@ -215,7 +216,7 @@ assignment_operator
 	;
 
 expression
-	: assignment_expression
+	: assignment_expression 
 	| expression COMMA assignment_expression
 	;
 
@@ -532,12 +533,17 @@ expression_statement
 	: SEMICOLON
 	| expression SEMICOLON
 	| expression error { printf("Linea: %i. Falta ';'\n\n", yylineno); yyerrok; }
+	| error SEMICOLON { printf("Linea: %i. Expresion invalida.\n\n", yylineno); yyerrok; }
 	;
 
 selection_statement
-	: IF LPARENTHESIS expression RPARENTHESIS statement ELSE statement
-	| IF LPARENTHESIS expression RPARENTHESIS statement
+	: IF LPARENTHESIS expression RPARENTHESIS { inicio_if(); } statement { inicio_else(); } else_block { fin_if(); }
 	| SWITCH LPARENTHESIS expression RPARENTHESIS statement
+	;
+
+else_block
+	: ELSE statement
+	| %empty
 	;
 
 iteration_statement
@@ -582,6 +588,7 @@ declaration_list
 
 extern int yylineno;
 extern char* yytext;
+
 void yyerror(const char *s)
 {
 	//printf("%s in line: %i, lexeme: %s\n", s, yylineno, yytext);
@@ -611,3 +618,4 @@ void yyerror(const char *s)
 	    printf("Error al reportar el error");
 	}
 }
+

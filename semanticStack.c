@@ -1,4 +1,5 @@
 #include "semanticStack.h"
+#include "compiler.h"
 
 
 LIST newList(void){
@@ -91,12 +92,27 @@ struct SemanticRecord *createIDSR(char *IDStr){
   return SR;
 }
 
-struct SemanticRecord *createDOSR(char *data){
+struct SemanticRecord *createIFSR(){
+  struct SemanticRecord *SR = malloc(sizeof(struct SemanticRecord));
+  struct IFS *IFDataBlock = malloc(sizeof(struct IFS));
+
+  IFDataBlock->else_label = calloc (15, sizeof(char));
+  IFDataBlock->exit_label = calloc (15, sizeof(char));
+
+  SR->tag = _IF;
+  strcpy(IFDataBlock->else_label, generarLabels(0));
+  strcpy(IFDataBlock->exit_label, generarLabels(0));
+  SR->DataBlock = IFDataBlock;
+  return SR;
+}
+
+struct SemanticRecord *createDOSR(int type, char *data){
   struct SemanticRecord *SR = malloc(sizeof(struct SemanticRecord));
   struct DO *DODataBlock = malloc(sizeof(struct DO));
   DODataBlock->data = calloc (strlen(data), sizeof(char));
   SR->tag = _DO;
   strcpy(DODataBlock->data, data);
+  DODataBlock->type = type;
   SR->DataBlock = DODataBlock;
   return SR;
 }
@@ -108,6 +124,7 @@ void freeSemanticRecord (struct SemanticRecord *semanticRecord){
   struct ID *IDDataBlock;
   struct DO *DODataBlock;
   struct Type *typeDataBlock;
+  struct IFS *IFDataBlock;
   switch (SR->tag) {
     case _ID:
       IDDataBlock = (struct ID *)SR->DataBlock;
@@ -120,11 +137,17 @@ void freeSemanticRecord (struct SemanticRecord *semanticRecord){
       free(typeDataBlock);
       break;
     case _DO:
-    DODataBlock = (struct DO *)SR->DataBlock;
+      DODataBlock = (struct DO *)SR->DataBlock;
       free(DODataBlock->data);
       free(DODataBlock);
       break;
     case _TOKEN:
+      break;
+    case _IF:
+      IFDataBlock = (struct IFS *)SR -> DataBlock;
+      free(IFDataBlock->else_label);
+      free(IFDataBlock->exit_label);
+      free(IFDataBlock);
       break;
   }
   free(semanticRecord);
@@ -345,8 +368,3 @@ int pruebaRetrieve0(){
   }
   return 0;
 }
-
-// int main(){
-//   //pruebaRetrieve0();
-//   return 0;
-// }
