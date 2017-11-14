@@ -41,14 +41,6 @@ void yyerror(const char *s);
 
 %%
 
-print_token
-	: %empty {printf("\t--Token: %s\n", yytext);}
-	;
-
-saveID
- : %empty {printf("\t--ID: %s\n", yytext); saveIDAS(yytext);}
- ;
-
 saveType
 	: %empty {printf("\t--Type: %s\n", yytext); saveTypeAS(yytext);}
 	;
@@ -389,7 +381,7 @@ declarator
 	;
 
 direct_declarator
-	: saveID ID
+	: ID {printf("\t--ID: %s\n", $1); saveIDAS($1);}
 	| error { printf("Linea: %i. Nombre de variable invalido: %s.\n\n", yylineno, yytext); }
 	| LPARENTHESIS declarator RPARENTHESIS
 	| direct_declarator LBRACE RBRACE
