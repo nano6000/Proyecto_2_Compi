@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "compiler.h"
-#include "parser.tab.c"
 #include "semanticStack.c"
+#include "parser.tab.c"
 
 #define BETWEEN(value, min, max) (value <= max && value >= min)
 

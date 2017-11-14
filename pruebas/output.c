@@ -1,31 +1,14 @@
-int main ()
-{
-	int j;
-	int a, b, c, d;
-	if(2==2)
-	{
-		if(3==2)
-			j = 6;
-		else
-			j = 5;
-	}
-}
 
 
-int f()
-{
-	int a = 0;
-	return a;
-}
 
-int g()
-{
-	int a = 0;
-	return a;
-}
 
-int h()
-{
-	int a = 0;
-	return a;
+int main(int *argc, char **argv){
+  char a;
+  int b;
+  int c, d, e, f;
+  int *b;
+  return 0;
+  int w = main();
+  w += 35;
+  int w = 32;
 }
