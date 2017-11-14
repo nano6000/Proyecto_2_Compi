@@ -19,7 +19,8 @@ int main ()
 			{
 				int v;
 				int k;
-				9 + 5 * 8 - 9;
+				break;
+				9 + j * 8 - 9;
 				do
 					5+6;
 				while (5);
