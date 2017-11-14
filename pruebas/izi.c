@@ -1,18 +1,29 @@
 int main ()
 {
 	int j;
-	int a, b, c, d;
-	if(2==2)
+	int a, b, c, hola;
+	if(2+56)
 	{
-		if(3==2)
-			j = 6;
+		if(3%2)
+		{
+			a++;
+			while (2+6)
+			{
+				int v;
+				int k;
+				9 + 5 * 8 - 9;
+				do
+					5+6;
+				while (5);
+			}
+		}
 		else
 			j = 5;
 	}
 }
 
 
-int f()
+int a()
 {
 	int a = 0;
 	return a;

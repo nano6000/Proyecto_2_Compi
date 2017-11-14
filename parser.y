@@ -8,8 +8,8 @@ void yyerror(const char *s);
 
 
 %token	CONSTANT STRING FUNC_NAME SIZEOF
-%token	PTR_OP INC_OP DEC_OP SHL SHR LE_OP GE_OP EQ_OP NE_OP
-%token	AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
+%token	PTR_OP        
+%token	  MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token	SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
 %token	XOR_ASSIGN OR_ASSIGN TYPE_NAME
 %token	TYPEDEF_NAME ENUMERATION_CONSTANT
@@ -25,11 +25,30 @@ void yyerror(const char *s);
 %token	ALIGNAS ALIGNOF ATOMIC GENERIC NORETURN STATIC_ASSERT THREAD_LOCAL
 
 %token SEMICOLON LPARENTHESIS RPARENTHESIS LBRACE RBRACE COMMA COLON
-%token EQUALS LBRACKET RBRACKET DOT AMPERSAND EXCLAMATION MINUS PLUS TILDE
-%token STAR SLASH BACKSLASH MODULO LESS_THAN GREATER_THAN CARET PIPE QUESTION_MARK
+%token EQUALS LBRACKET RBRACKET DOT  EXCLAMATION TILDE
+%token   BACKSLASH    CARET  QUESTION_MARK
 %token CHARACTER SEPARATOR QOUTE
 
-%token <string>   ID
+%token <string> ID 
+%token <string> PLUS
+%token <string> MINUS
+%token <string> STAR
+%token <string> SLASH
+%token <string> MODULO
+%token <string> LESS_THAN
+%token <string> GREATER_THAN
+%token <string> AMPERSAND
+%token <string> SHL
+%token <string> SHR
+%token <string> LE_OP
+%token <string> GE_OP
+%token <string> EQ_OP
+%token <string> NE_OP
+%token <string> AND_OP
+%token <string> OR_OP
+%token <string> PIPE
+%token <string> INC_OP
+%token <string> DEC_OP
 
 %start translation_unit
 %define parse.error verbose
@@ -49,7 +68,7 @@ save_pointer
 	: %empty {printf("\t--Pointer: %s\n", yytext); /*GetTop, which is a Type, add "*"" to it*/ savePointerAS();}
 
 primary_expression
-	: ID { printf("%s\n", $1);}
+	: ID { process_id($1); }
 	| { process_literal(yytext); } CONSTANT
 	| STRING
 	| LPARENTHESIS expression RPARENTHESIS
@@ -94,8 +113,8 @@ argument_expression_list
 
 unary_expression
 	: postfix_expression
-	| INC_OP unary_expression
-	| DEC_OP unary_expression
+	| INC_OP { process_op($1); } unary_expression {eval_unary();}
+	| DEC_OP { process_op($1); } unary_expression {eval_unary();}
 	| unary_operator cast_expression
 	| SIZEOF unary_expression
 	| SIZEOF LPARENTHESIS type_name RPARENTHESIS
@@ -118,16 +137,16 @@ cast_expression
 
 multiplicative_expression
 	: cast_expression
-	| multiplicative_expression STAR cast_expression
-	| multiplicative_expression SLASH cast_expression
-	| multiplicative_expression MODULO cast_expression
+	| multiplicative_expression STAR { process_op($2); }  cast_expression { eval_binary(); }
+	| multiplicative_expression SLASH { process_op($2); } cast_expression { eval_binary(); }
+	| multiplicative_expression MODULO { process_op($2); } cast_expression { eval_binary(); }
 	;
 
 additive_expression
 	: multiplicative_expression
-	| additive_expression PLUS multiplicative_expression
+	| additive_expression PLUS { process_op($2); } multiplicative_expression { eval_binary(); }
 	| additive_expression PLUS error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
-	| additive_expression MINUS multiplicative_expression
+	| additive_expression MINUS { process_op($2); } multiplicative_expression { eval_binary(); }
 	| additive_expression MINUS error { printf("Linea: %i. Expresion faltante antes de '%s'\n\n", yylineno, yytext); yyerrok; }
 	;
 
@@ -198,7 +217,7 @@ conditional_expression
 
 assignment_expression
 	: conditional_expression
-	| unary_expression { printf("aqui entra\n"); } assignment_operator assignment_expression 
+	| unary_expression assignment_operator assignment_expression 
 	;
 
 assignment_operator
@@ -547,8 +566,8 @@ else_block
 	;
 
 iteration_statement
-	: WHILE LPARENTHESIS expression RPARENTHESIS statement
-	| DO statement WHILE LPARENTHESIS expression RPARENTHESIS SEMICOLON
+	: WHILE { inicio_while(); } LPARENTHESIS expression RPARENTHESIS { eval_while(); } statement {fin_while();}
+	| DO { inicio_DOwhile(); } statement WHILE LPARENTHESIS expression RPARENTHESIS { eval_DOwhile(); } SEMICOLON { fin_DOwhile(); }
 	| FOR LPARENTHESIS expression_statement expression_statement RPARENTHESIS statement
 	| FOR LPARENTHESIS expression_statement expression_statement expression RPARENTHESIS statement
 	| FOR LPARENTHESIS declaration expression_statement RPARENTHESIS statement

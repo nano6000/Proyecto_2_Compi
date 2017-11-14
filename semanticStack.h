@@ -2,12 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define _ERROR 0
 #define _ID 1
 #define _TYPE 2
 #define _DO 3
 #define _TOKEN 4
 #define _IF 5
 #define _LITERAL 6
+#define _WHILE 7
+#define _DOWHILE 8
 
 
 struct List {
@@ -59,6 +62,22 @@ struct IFS{
 struct DO{
   int type;
   char *data;
+};
+
+struct TOKEN{
+  char *data;
+};
+
+struct WHILE
+{
+  char* begin_label;
+  char* exit_label;
+};
+
+struct DOWHILE
+{
+  char* begin_label;
+  char* exit_label;
 };
 
 

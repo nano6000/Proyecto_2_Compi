@@ -117,6 +117,44 @@ struct SemanticRecord *createDOSR(int type, char *data){
   return SR;
 }
 
+struct SemanticRecord *createTOKENSR(char *data){
+  struct SemanticRecord *SR = malloc(sizeof(struct SemanticRecord));
+  struct TOKEN *TOKENDataBlock = malloc(sizeof(struct TOKEN));
+  TOKENDataBlock->data = calloc (strlen(data), sizeof(char));
+  SR->tag = _TOKEN;
+  strcpy(TOKENDataBlock->data, data);
+  SR->DataBlock = TOKENDataBlock;
+  return SR;
+}
+
+struct SemanticRecord *createWhileSR(){
+  struct SemanticRecord *SR = malloc(sizeof(struct SemanticRecord));
+  struct WHILE *WhileDataBlock = malloc(sizeof(struct WHILE));
+
+  WhileDataBlock->begin_label = calloc (15, sizeof(char));
+  WhileDataBlock->exit_label = calloc (15, sizeof(char));
+
+  SR->tag = _WHILE;
+  strcpy(WhileDataBlock->begin_label, generarLabels(0));
+  strcpy(WhileDataBlock->exit_label, generarLabels(0));
+  SR->DataBlock = WhileDataBlock;
+  return SR;
+}
+
+struct SemanticRecord *createDoWhileSR(){
+  struct SemanticRecord *SR = malloc(sizeof(struct SemanticRecord));
+  struct DOWHILE *WhileDataBlock = malloc(sizeof(struct DOWHILE));
+
+  WhileDataBlock->begin_label = calloc (15, sizeof(char));
+  WhileDataBlock->exit_label = calloc (15, sizeof(char));
+
+  SR->tag = _DOWHILE;
+  strcpy(WhileDataBlock->begin_label, generarLabels(0));
+  strcpy(WhileDataBlock->exit_label, generarLabels(0));
+  SR->DataBlock = WhileDataBlock;
+  return SR;
+}
+
 /*Libera el espacio usado por un Registro Semántico*/
 void freeSemanticRecord (struct SemanticRecord *semanticRecord){
 

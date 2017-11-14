@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 
     yyparse();
 
-	printf("Finished parsing\n");
+	/*printf("Finished parsing\n");
 
 	LIST PS = getSemanticStack();
 	struct SemanticRecord * testSR = (struct SemanticRecord *)GET_TOP(PS);
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 	printf("Tag 1 is ID, so, value of id is %s\n",id->id);
 	}
 	testSR = (struct SemanticRecord *)testSR->node.pred;
-	}
+	}*/
 
     fclose(yyin);
     fclose(out_file);
@@ -148,19 +148,32 @@ int escribirSalida(char* inst)
 
 void inicio_if()
 {
+	struct SemanticRecord *DORS = (struct SemanticRecord*)POP(semanticStack);
+	struct DO *DO = (struct DO *)DORS->DataBlock;
+
+	char* inst = malloc(50*sizeof(char));
+
+	strcpy(inst, "-----inicio_if\n");
+	escribirSalida(inst);
+
+	strcpy(inst, "\tcmp ");
+	strcat(inst, DO->data);
+	strcat(inst, ", 0\n");
+	escribirSalida(inst);
+
 	struct SemanticRecord *RSIF;
 	RSIF = createIFSR();
 	PUSH(semanticStack, (NODE)RSIF);
 
 	struct IFS *ifs = (struct IFS *)RSIF->DataBlock;
 
-	char* inst = malloc(50*sizeof(char));
 	strcpy(inst, "\tjz ");
 	strcat(inst, ifs->else_label);
-	strcat(inst, "\n");
+	strcat(inst, "\n\n");
 	escribirSalida(inst);
 
 	free(inst);
+	freeSemanticRecord(DORS);
 }
 
 void fin_if()
@@ -169,13 +182,22 @@ void fin_if()
 	struct IFS *ifs = (struct IFS *)ifsRS->DataBlock;
 
 	char* inst = malloc(50*sizeof(char));
+
+	strcpy(inst, "-----fin_if\n");
+	escribirSalida(inst);
+
 	strcpy(inst, ifs->exit_label);
-	strcat(inst, ":\n");
+	strcat(inst, ":\n\n");
 	escribirSalida(inst);
 
 	free(inst);
 
 	struct SemanticRecord *TOP = (struct SemanticRecord*)POP(semanticStack);
+	while (TOP->tag != _IF)
+	{
+		freeSemanticRecord(TOP);
+		TOP = (struct SemanticRecord*)POP(semanticStack);
+	}
     freeSemanticRecord(TOP);
 }
 
@@ -186,13 +208,16 @@ void inicio_else()
 
 	char* inst = malloc(50*sizeof(char));
 
+	strcpy(inst, "-----inicio_else\n");
+	escribirSalida(inst);
+
 	strcpy(inst, "\tjmp ");
 	strcat(inst, ifs->exit_label);
 	strcat(inst, "\n");
 	escribirSalida(inst);
 
 	strcpy(inst, ifs->else_label);
-	strcat(inst, ":\n");
+	strcat(inst, ":\n\n");
 	escribirSalida(inst);
 
 	free(inst);
@@ -209,7 +234,7 @@ void process_literal (char* text)
 void process_id (char* text) 
 {
 	struct SemanticRecord *RSDO;
-	RSDO = createDOSR(_ID, text);
+	RSDO = createIDSR(text);
 	PUSH(semanticStack, (NODE)RSDO);
 	printf("ID: %s\n", text);
 
@@ -220,4 +245,435 @@ void process_id (char* text)
 		rs.name = id;*/
 }
 
+void process_op(char* text) 
+{
+	struct SemanticRecord *SR;
+	SR = createTOKENSR(text);
+	PUSH(semanticStack, (NODE)SR);
+	printf("OPERATOR: %s\n", text);
+}
 
+void eval_binary() 
+{
+	struct SemanticRecord *op2 = (struct SemanticRecord*)POP(semanticStack);
+	struct SemanticRecord *operador = (struct SemanticRecord*)POP(semanticStack);
+	struct SemanticRecord *op1 = (struct SemanticRecord*)POP(semanticStack);
+
+	struct SemanticRecord *RSDO;
+	char* inst = malloc(50*sizeof(char));
+	char* variableTemporal = malloc(15*sizeof(char));
+	variableTemporal = generarTemporales(0);
+
+	if(op1->tag && operador->tag && op2->tag)
+	{
+		struct TOKEN *token = (struct TOKEN *)operador->DataBlock;
+		struct DO *opDO = (struct DO *)op1->DataBlock;
+		if(!strcmp(token->data, "+"))
+		{
+			strcpy(inst, "\tmov ");
+			strcat(inst, variableTemporal);
+			strcat(inst, ", ");
+			strcat(inst, opDO->data);
+			strcat(inst, "\n");
+			escribirSalida(inst);
+
+			opDO = (struct DO *)op2->DataBlock;
+
+			strcpy(inst, "\tadd ");
+			strcat(inst, variableTemporal);
+			strcat(inst, ", ");
+			strcat(inst, opDO->data);
+			strcat(inst, "\n\n");
+			escribirSalida(inst);
+		}
+
+		else if(!strcmp(token->data, "-"))
+		{
+			strcpy(inst, "\tmov ");
+			strcat(inst, variableTemporal);
+			strcat(inst, ", ");
+			strcat(inst, opDO->data);
+			strcat(inst, "\n");
+			escribirSalida(inst);
+
+			opDO = (struct DO *)op2->DataBlock;
+
+			strcpy(inst, "\tsub ");
+			strcat(inst, variableTemporal);
+			strcat(inst, ", ");
+			strcat(inst, opDO->data);
+			strcat(inst, "\n\n");
+			escribirSalida(inst);
+		}
+
+		else if(!strcmp(token->data, "*"))
+		{
+			strcpy(inst, "\tmov al, ");
+			strcat(inst, opDO->data);
+			strcat(inst, "\n");
+			escribirSalida(inst);
+
+			opDO = (struct DO *)op2->DataBlock;
+
+			strcpy(inst, "\tmov cl, ");
+			strcat(inst, opDO->data);
+			strcat(inst, "\n");
+			escribirSalida(inst);
+
+			strcpy(inst, "\tmul cl\n");
+			escribirSalida(inst);
+
+			strcpy(inst, "\tmov ");
+			strcat(inst, variableTemporal);
+			strcat(inst, ", ax\n");
+			escribirSalida(inst);
+
+		}
+
+		else if(!strcmp(token->data, "/"))
+		{
+			strcpy(inst, "\tmov dx, 0\n");
+			escribirSalida(inst);
+
+			strcpy(inst, "\tmov ax, ");
+			strcat(inst, opDO->data);
+			strcat(inst, "\n");
+			escribirSalida(inst);
+
+			opDO = (struct DO *)op2->DataBlock;
+
+			strcpy(inst, "\tmov bx, ");
+			strcat(inst, opDO->data);
+			strcat(inst, "\n");
+			escribirSalida(inst);
+
+			strcpy(inst, "\tdiv bx\n");
+			escribirSalida(inst);
+
+			strcpy(inst, "\tmov ");
+			strcat(inst, variableTemporal);
+			strcat(inst, ", ax\n");
+			escribirSalida(inst);
+
+		}
+
+		else if(!strcmp(token->data, "/"))
+		{
+			strcpy(inst, "\tmov dx, 0\n");
+			escribirSalida(inst);
+
+			strcpy(inst, "\tmov ax, ");
+			strcat(inst, opDO->data);
+			strcat(inst, "\n");
+			escribirSalida(inst);
+
+			opDO = (struct DO *)op2->DataBlock;
+
+			strcpy(inst, "\tmov bx, ");
+			strcat(inst, opDO->data);
+			strcat(inst, "\n");
+			escribirSalida(inst);
+
+			strcpy(inst, "\tdiv bx\n");
+			escribirSalida(inst);
+
+			strcpy(inst, "\tmov ");
+			strcat(inst, variableTemporal);
+			strcat(inst, ", dx\n");
+			escribirSalida(inst);
+
+		}
+
+		else if(!strcmp(token->data, "="))
+		{
+			strcpy(inst, "\tmov ");
+			strcat(inst, opDO->data);
+
+			opDO = (struct DO *)op2->DataBlock;
+
+			strcat(inst, ", ");
+			strcat(inst, opDO->data);
+			strcat(inst, "\n\n");
+			escribirSalida(inst);
+
+
+			/*struct SemanticRecord *TOP = (struct SemanticRecord*)POP(semanticStack);
+			freeSemanticRecord(TOP);*/
+		}
+	}
+	else
+	{
+		RSDO = createDOSR(_ERROR, variableTemporal);
+		PUSH(semanticStack, (NODE)RSDO);
+	}
+
+	RSDO = createDOSR(_DO, variableTemporal);
+	PUSH(semanticStack, (NODE)RSDO);
+
+	freeSemanticRecord(op1);
+	freeSemanticRecord(operador);
+	freeSemanticRecord(op2);
+	//Si alguno es de tipo ERROR: Crear D.O de tipo ERROR;
+	//else:
+	//	Si no se requiere generar código: Crear D.O con resultado calculado; //verificar todos los casos
+	//else:Crear variable temporal; //crear esta función
+
+	//Generar código para temporal con op1, operador, op2; //ve-rificar para cada operador
+	//Crear D.O con referencia a temporal;
+	//PUSH(D.O);
+}
+
+void eval_unary() 
+{
+	struct SemanticRecord *op2 = (struct SemanticRecord*)POP(semanticStack);
+	struct SemanticRecord *op1 = (struct SemanticRecord*)POP(semanticStack);
+
+	struct SemanticRecord *RSDO;
+	char* inst = malloc(50*sizeof(char));
+	char* variableTemporal = malloc(15*sizeof(char));
+	variableTemporal = generarTemporales(0);
+
+	printf("Tag 1: %i\nTag 2: %i\n", op1->tag, op2->tag);
+
+	if(op1->tag && op2->tag)
+	{
+		if(op1->tag == _TOKEN)
+		{
+			struct TOKEN *op1DO = (struct TOKEN *)op1->DataBlock;
+			struct ID *op2DO = (struct ID *)op2->DataBlock;
+			if(!strcmp(op1DO->data, "++"))
+			{
+				strcpy(inst, "\tinc ");
+				strcat(inst, op2DO->id);
+				strcat(inst, "\n");
+				escribirSalida(inst);
+
+				strcpy(inst, "\tmov ");
+				strcat(inst, variableTemporal);
+				strcat(inst, ", ");
+				strcat(inst, op2DO->id);
+				strcat(inst, "\n\n");
+				escribirSalida(inst);
+			}
+
+			else if(!strcmp(op1DO->data, "--"))
+			{
+				strcpy(inst, "\tdec ");
+				strcat(inst, op2DO->id);
+				strcat(inst, "\n");
+				escribirSalida(inst);
+
+				strcpy(inst, "\tmov ");
+				strcat(inst, variableTemporal);
+				strcat(inst, ", ");
+				strcat(inst, op2DO->id);
+				strcat(inst, "\n\n");
+				escribirSalida(inst);
+			}
+		}
+		else
+		{
+			struct DO *op1DO = (struct DO *)op1->DataBlock;
+			struct DO *op2DO = (struct DO *)op2->DataBlock;
+			if(!strcmp(op2DO->data, "++"))
+			{
+				strcpy(inst, "\tmov ");
+				strcat(inst, variableTemporal);
+				strcat(inst, ", ");
+				strcat(inst, op1DO->data);
+				strcat(inst, "\n\n");
+				escribirSalida(inst);
+
+				strcpy(inst, "\tinc ");
+				strcat(inst, op1DO->data);
+				strcat(inst, "\n");
+				escribirSalida(inst);
+			}
+
+			else if(!strcmp(op2DO->data, "--"))
+			{
+				strcpy(inst, "\tmov ");
+				strcat(inst, variableTemporal);
+				strcat(inst, ", ");
+				strcat(inst, op1DO->data);
+				strcat(inst, "\n\n");
+				escribirSalida(inst);
+
+				strcpy(inst, "\tdec ");
+				strcat(inst, op1DO->data);
+				strcat(inst, "\n");
+				escribirSalida(inst);
+			}
+		}
+	}
+	else
+	{
+		RSDO = createDOSR(_ERROR, variableTemporal);
+		PUSH(semanticStack, (NODE)RSDO);
+	}
+
+	RSDO = createDOSR(_DO, variableTemporal);
+	PUSH(semanticStack, (NODE)RSDO);
+
+	freeSemanticRecord(op1);
+	freeSemanticRecord(op2);
+	//Si alguno es de tipo ERROR: Crear D.O de tipo ERROR;
+	//else:
+	//	Si no se requiere generar código: Crear D.O con resultado calculado; //verificar todos los casos
+	//else:Crear variable temporal; //crear esta función
+
+	//Generar código para temporal con op1, operador, op2; //ve-rificar para cada operador
+	//Crear D.O con referencia a temporal;
+	//PUSH(D.O);
+}
+
+void inicio_while()
+{
+	char* inst = malloc(50*sizeof(char));
+
+	strcpy(inst, "-----inicio_while\n");
+	escribirSalida(inst);
+
+	struct SemanticRecord *RSWHILE;
+	RSWHILE = createWhileSR();
+	PUSH(semanticStack, (NODE)RSWHILE);
+
+
+	struct WHILE *While = (struct WHILE *)RSWHILE->DataBlock;
+
+	strcpy(inst, While->begin_label);
+	strcat(inst, "\n\n");
+	escribirSalida(inst);
+
+	free(inst);
+}
+
+void eval_while()
+{
+	struct SemanticRecord *DORS = (struct SemanticRecord*)POP(semanticStack);
+	struct DO *DO = (struct DO *)DORS->DataBlock;
+
+	char* inst = malloc(50*sizeof(char));
+
+	strcpy(inst, "-----eval_while\n");
+	escribirSalida(inst);
+
+	strcpy(inst, "\tcmp ");
+	strcat(inst, DO->data);
+	strcat(inst, ", 0\n");
+	escribirSalida(inst);
+
+	struct SemanticRecord *RSWHILE = (struct SemanticRecord *)RETRIEVE_SR(semanticStack, 7);
+	struct WHILE *While = (struct WHILE *)RSWHILE->DataBlock;
+
+	strcpy(inst, "\tjz ");
+	strcat(inst, While->exit_label);
+	strcat(inst, "\n\n");
+	escribirSalida(inst);
+
+	free(inst);
+	freeSemanticRecord(DORS);
+}
+
+void fin_while()
+{
+	struct SemanticRecord *RSWHILE = (struct SemanticRecord *)RETRIEVE_SR(semanticStack, 7);
+	struct WHILE *While = (struct WHILE *)RSWHILE->DataBlock;
+
+	char* inst = malloc(50*sizeof(char));
+
+	strcpy(inst, "-----fin_while\n");
+	escribirSalida(inst);
+
+	strcpy(inst, "\tjmp ");
+	strcat(inst, While->begin_label);
+	strcat(inst, ":\n");
+	escribirSalida(inst);
+
+	strcpy(inst, While->exit_label);
+	strcat(inst, ":\n\n");
+	escribirSalida(inst);
+
+	free(inst);
+
+	struct SemanticRecord *TOP = (struct SemanticRecord*)POP(semanticStack);
+	while (TOP->tag != _WHILE)
+	{
+		freeSemanticRecord(TOP);
+		TOP = (struct SemanticRecord*)POP(semanticStack);
+	}
+    freeSemanticRecord(TOP);
+}
+
+void inicio_DOwhile()
+{
+	char* inst = malloc(50*sizeof(char));
+
+	strcpy(inst, "-----inicio_DOwhile\n");
+	escribirSalida(inst);
+
+	struct SemanticRecord *RSWHILE;
+	RSWHILE = createDoWhileSR();
+	PUSH(semanticStack, (NODE)RSWHILE);
+
+
+	struct WHILE *While = (struct WHILE *)RSWHILE->DataBlock;
+
+	strcpy(inst, While->begin_label);
+	strcat(inst, ":\n\n");
+	escribirSalida(inst);
+
+	free(inst);
+}
+
+void eval_DOwhile()
+{
+	struct SemanticRecord *DORS = (struct SemanticRecord*)POP(semanticStack);
+	struct DO *DO = (struct DO *)DORS->DataBlock;
+
+	char* inst = malloc(50*sizeof(char));
+
+	strcpy(inst, "-----eval_DOwhile\n");
+	escribirSalida(inst);
+
+	strcpy(inst, "\tcmp ");
+	strcat(inst, DO->data);
+	strcat(inst, ", 0\n");
+	escribirSalida(inst);
+
+	struct SemanticRecord *RSWHILE = (struct SemanticRecord *)RETRIEVE_SR(semanticStack, 8);
+	struct DOWHILE *DoWhile = (struct DOWHILE *)RSWHILE->DataBlock;
+
+	strcpy(inst, "\tjnz ");
+	strcat(inst, DoWhile->begin_label);
+	strcat(inst, "\n\n");
+	escribirSalida(inst);
+
+	free(inst);
+	freeSemanticRecord(DORS);
+}
+
+void fin_DOwhile()
+{
+	struct SemanticRecord *RSWHILE = (struct SemanticRecord *)RETRIEVE_SR(semanticStack, 8);
+	struct DOWHILE *DoWhile = (struct DOWHILE *)RSWHILE->DataBlock;
+
+	char* inst = malloc(50*sizeof(char));
+
+	strcpy(inst, "-----fin_DOwhile\n");
+	escribirSalida(inst);
+
+	strcpy(inst, DoWhile->exit_label);
+	strcat(inst, ":\n\n");
+	escribirSalida(inst);
+
+	free(inst);
+
+	struct SemanticRecord *TOP = (struct SemanticRecord*)POP(semanticStack);
+	while (TOP->tag != _DOWHILE)
+	{
+		freeSemanticRecord(TOP);
+		TOP = (struct SemanticRecord*)POP(semanticStack);
+	}
+    freeSemanticRecord(TOP);
+}
