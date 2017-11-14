@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "compiler.h"
+#include "semanticStack.c"
 #include "parser.tab.c"
 //#include "beamerWrite.c"
 //#include "lex.yy.c"
@@ -26,6 +27,8 @@ int cant_define;	//Cantidad de defines actualeas
 char* replacement; //varible que contiene la definicion de una macro especifica
 */
 char* outputName;
+LIST semanticStack;
+
 /*
 void rmQuote(char *d , char *s)
 {
@@ -374,6 +377,22 @@ int main(int argc, char **argv)
     yydebug = 0;
 
     yyparse();
+		printf("Finished parsing\n");
+
+		LIST PS = getSemanticStack();
+		struct SemanticRecord * testSR = (struct SemanticRecord *)GET_TOP(PS);
+		while (testSR){
+			if (testSR->tag == 2){
+				struct Type *type = (struct Type *)testSR->DataBlock;
+				printf("Tag 2 is type, so, value of type is %s\n",type->type);
+			}
+			else if(testSR->tag == 1){
+				struct ID *id = (struct ID *)testSR->DataBlock;
+				printf("Tag 1 is ID, so, value of id is %s\n",id->id);
+			}
+			testSR = (struct SemanticRecord *)testSR->node.pred;
+		}
+
 
     fclose(yyin);
     yyterminate();

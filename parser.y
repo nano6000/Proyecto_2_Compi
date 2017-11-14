@@ -2,6 +2,7 @@
 #include "lex.yy.c"
 void yyerror(const char *s);
 
+
 %}
 
 
@@ -31,11 +32,26 @@ void yyerror(const char *s);
 %define parse.error verbose
 %%
 
+print_token
+	: %empty {printf("\t--Token: %s\n", yytext);}
+	;
+
+saveID
+ : %empty {printf("\t--ID: %s\n", yytext); saveIDAS(yytext);}
+ ;
+
+saveType
+	: %empty {printf("\t--Type: %s\n", yytext); saveTypeAS(yytext);}
+	;
+
+save_pointer
+	: %empty {printf("\t--Pointer: %s\n", yytext); /*GetTop, which is a Type, add "*"" to it*/ savePointerAS();}
+
 primary_expression
 	: ID
 	| CONSTANT
 	| STRING
-	| LPARENTHESIS expression RPARENTHESIS	
+	| LPARENTHESIS expression RPARENTHESIS
 	| LPARENTHESIS expression error { printf("Linea: %i. Caracter ')' faltante\n\n", yylineno); yyerrok;}
 	| LPARENTHESIS error RPARENTHESIS { printf("Linea: %i. Expresion invalida\n\n", yylineno); yyerrok;}
 	| generic_selection
@@ -207,12 +223,18 @@ constant_expression
 	: conditional_expression	/* with constraints */
 	;
 
+
+declaration2
+	:SEMICOLON
+	| error { printf("Linea: %i. Se encontro '%s', cuando se esperaba ';'\n\n", yylineno, yytext);}
+	| init_declarator_list SEMICOLON
+	| init_declarator_list error { printf("Linea: %i. Se encontro '%s', cuando se esperaba ';'\n\n", yylineno, yytext);}
+	| error SEMICOLON { yyerrok;}
+	;
+
+
 declaration
-	: declaration_specifiers SEMICOLON
-	| declaration_specifiers error { printf("Linea: %i. Se encontro '%s', cuando se esperaba ';'\n\n", yylineno, yytext);}
-	| declaration_specifiers init_declarator_list SEMICOLON
-	| declaration_specifiers init_declarator_list error { printf("Linea: %i. Se encontro '%s', cuando se esperaba ';'\n\n", yylineno, yytext);}
-	| declaration_specifiers error SEMICOLON { yyerrok;}
+	: saveType declaration_specifiers declaration2
 	| error SEMICOLON { yyerrok; }
 	| static_assert_declaration
 	;
@@ -230,6 +252,7 @@ declaration_specifiers
 	| alignment_specifier
 	| error {printf("Linea: %i. Tipo de variable invalida.\n\n", yylineno); yyclearin; }
 	;
+
 
 init_declarator_list
 	: init_declarator
@@ -357,7 +380,7 @@ declarator
 	;
 
 direct_declarator
-	: ID
+	: saveID ID
 	| error { printf("Linea: %i. Nombre de variable invalido: %s.\n\n", yylineno, yytext); }
 	| LPARENTHESIS declarator RPARENTHESIS
 	| direct_declarator LBRACE RBRACE
@@ -375,10 +398,10 @@ direct_declarator
 	;
 
 pointer
-	: STAR type_qualifier_list pointer
-	| STAR type_qualifier_list
-	| STAR pointer
-	| STAR
+	: save_pointer STAR type_qualifier_list pointer
+	| save_pointer STAR type_qualifier_list
+	| save_pointer STAR pointer
+	| save_pointer STAR
 	;
 
 type_qualifier_list
@@ -398,14 +421,15 @@ parameter_list
 	;
 
 parameter_declaration
-	: declaration_specifiers declarator
-	| declaration_specifiers abstract_declarator
-	| declaration_specifiers
+	: saveType declaration_specifiers declarator
+	| saveType declaration_specifiers abstract_declarator
+	| saveType declaration_specifiers
 	;
 
+
 ID_list
-	: ID
-	| ID_list COMMA ID
+	:  ID
+	|  ID_list COMMA ID
 	;
 
 type_name
@@ -544,8 +568,8 @@ external_declaration
 	;
 
 function_definition
-	: declaration_specifiers declarator declaration_list compound_statement
-	| declaration_specifiers declarator compound_statement
+	: saveType declaration_specifiers declarator declaration_list compound_statement
+	| saveType declaration_specifiers declarator compound_statement
 	;
 
 declaration_list

@@ -170,6 +170,31 @@ LIST getSymbolTableStack(){
   return symbolTable;
 }
 
+void saveTypeAS(char *type){
+  LIST PS = getSemanticStack();
+  PUSH(PS, (NODE)createTypeSR(type));
+}
+
+void saveIDAS(char *ID){
+  LIST PS = getSemanticStack();
+  PUSH(PS, (NODE)createIDSR(ID));
+}
+
+/*Asume que el top de la pila es un type*/
+void savePointerAS(){
+  LIST PS = getSemanticStack();
+  struct SemanticRecord *SR = (struct SemanticRecord *)POP(PS);
+  struct Type* type = (struct Type*)SR->DataBlock;
+
+  int len = strlen(type->type);
+
+  type->type = realloc(type->type, (len+1) * sizeof(char));
+  type->type[len] = '*';
+  type->type[len+1] = 0;
+
+  PUSH(PS, (NODE)SR);
+
+}
 
 int SymbolTableStackTest(){
   LIST SymbolTableStack;
@@ -321,7 +346,7 @@ int pruebaRetrieve0(){
   return 0;
 }
 
-int main(){
-  //pruebaRetrieve0();
-  return 0;
-}
+// int main(){
+//   //pruebaRetrieve0();
+//   return 0;
+// }
