@@ -164,7 +164,7 @@ extern FILE *yyin, *yyout;
     
     /* Note: We specifically omit the test for yy_rule_can_match_eol because it requires
      *       access to the local variable yy_act. Since yyless() is a macro, it would break
-     *       existing scanners that call yyless() from OUTSIDE yylex. 
+     *       existing scanners that call yyless() from OUTSIDE yylex.
      *       One obvious solution it to make yy_act a global. I tried that, and saw
      *       a 5% performance hit in a non-yylineno scanner, because yy_act is
      *       normally declared as a register variable-- so it is not worth it.
@@ -176,7 +176,6 @@ extern FILE *yyin, *yyout;
                     if ( yytext[yyl] == '\n' )\
                         --yylineno;\
             }while(0)
-<<<<<<< HEAD
     #define YY_LINENO_REWIND_TO(dst) \
             do {\
                 const char *p;\
@@ -184,8 +183,6 @@ extern FILE *yyin, *yyout;
                     if ( *p == '\n' )\
                         --yylineno;\
             }while(0)
-=======
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -242,7 +239,7 @@ struct yy_buffer_state
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
-    
+
 	/* Whether to try to fill the input buffer when we reach the
 	 * end of it.
 	 */
@@ -788,17 +785,12 @@ extern int yywrap ( void );
 #endif
 #endif
 
-<<<<<<< HEAD
 #ifndef YY_NO_UNPUT
     
     static void yyunput ( int c, char *buf_ptr  );
     
 #endif
 
-=======
-    static void yyunput (int c,char *buf_ptr  );
-    
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
 #ifndef yytext_ptr
 static void yy_flex_strncpy ( char *, const char *, int );
 #endif
@@ -920,23 +912,10 @@ extern int yylex (void);
  */
 YY_DECL
 {
-<<<<<<< HEAD
 	yy_state_type yy_current_state;
 	char *yy_cp, *yy_bp;
 	int yy_act;
     
-=======
-	register yy_state_type yy_current_state;
-	register char *yy_cp, *yy_bp;
-	register int yy_act;
-    
-#line 27 "flex.l"
-
-
-
-#line 918 "lex.yy.c"
-
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
 	if ( !(yy_init) )
 		{
 		(yy_init) = 1;
@@ -1019,11 +998,7 @@ yy_find_action:
 			int yyl;
 			for ( yyl = 0; yyl < yyleng; ++yyl )
 				if ( yytext[yyl] == '\n' )
-<<<<<<< HEAD
 					
-=======
-					   
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
     yylineno++;
 ;
 			}
@@ -1855,13 +1830,8 @@ static int yy_get_next_buffer (void)
 
     static yy_state_type yy_get_previous_state (void)
 {
-<<<<<<< HEAD
 	yy_state_type yy_current_state;
 	char *yy_cp;
-=======
-	register yy_state_type yy_current_state;
-	register char *yy_cp;
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
     
 	yy_current_state = (yy_start);
 
@@ -1913,17 +1883,11 @@ static int yy_get_next_buffer (void)
 		return yy_is_jam ? 0 : yy_current_state;
 }
 
-<<<<<<< HEAD
 #ifndef YY_NO_UNPUT
 
     static void yyunput (int c, char * yy_bp )
 {
 	char *yy_cp;
-=======
-    static void yyunput (int c, register char * yy_bp )
-{
-	register char *yy_cp;
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
     
     yy_cp = (yy_c_buf_p);
 
@@ -2035,11 +1999,7 @@ static int yy_get_next_buffer (void)
 	(yy_hold_char) = *++(yy_c_buf_p);
 
 	if ( c == '\n' )
-<<<<<<< HEAD
 		
-=======
-		   
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
     yylineno++;
 ;
 
@@ -2118,11 +2078,7 @@ static void yy_load_buffer_state  (void)
 {
 	YY_BUFFER_STATE b;
     
-<<<<<<< HEAD
 	b = (YY_BUFFER_STATE) yyalloc( sizeof( struct yy_buffer_state )  );
-=======
-	b = (YY_BUFFER_STATE) yyalloc(sizeof( struct yy_buffer_state )  );
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
 
@@ -2161,13 +2117,6 @@ static void yy_load_buffer_state  (void)
 	yyfree( (void *) b  );
 }
 
-<<<<<<< HEAD
-=======
-#ifndef __cplusplus
-extern int isatty (int );
-#endif /* __cplusplus */
-    
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a yyrestart() or at EOF.
@@ -2177,11 +2126,7 @@ extern int isatty (int );
 {
 	int oerrno = errno;
     
-<<<<<<< HEAD
 	yy_flush_buffer( b );
-=======
-	yy_flush_buffer(b );
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
 
 	b->yy_input_file = file;
 	b->yy_fill_buffer = 1;
@@ -2298,9 +2243,9 @@ static void yyensure_buffer_stack (void)
 								);
 		if ( ! (yy_buffer_stack) )
 			YY_FATAL_ERROR( "out of dynamic memory in yyensure_buffer_stack()" );
-								  
+
 		memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state*));
-				
+
 		(yy_buffer_stack_max) = num_to_alloc;
 		(yy_buffer_stack_top) = 0;
 		return;
@@ -2329,11 +2274,7 @@ static void yyensure_buffer_stack (void)
  * @param base the character buffer
  * @param size the size in bytes of the character buffer
  * 
-<<<<<<< HEAD
  * @return the newly allocated buffer state object.
-=======
- * @return the newly allocated buffer state object. 
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
  */
 YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size )
 {
@@ -2375,22 +2316,13 @@ YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size )
 YY_BUFFER_STATE yy_scan_string (const char * yystr )
 {
     
-<<<<<<< HEAD
 	return yy_scan_bytes( yystr, (int) strlen(yystr) );
-=======
-	return yy_scan_bytes(yystr,strlen(yystr) );
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
 }
 
 /** Setup the input buffer state to scan the given bytes. The next call to yylex() will
  * scan from a @e copy of @a bytes.
-<<<<<<< HEAD
  * @param yybytes the byte buffer to scan
  * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
-=======
- * @param bytes the byte buffer to scan
- * @param len the number of bytes in the buffer pointed to by @a bytes.
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
  * 
  * @return the newly allocated buffer state object.
  */
@@ -2398,12 +2330,8 @@ YY_BUFFER_STATE yy_scan_bytes  (const char * yybytes, int  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
-<<<<<<< HEAD
 	yy_size_t n;
 	int i;
-=======
-	yy_size_t n, i;
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = (yy_size_t) (_yybytes_len + 2);
@@ -2462,11 +2390,7 @@ static void yynoreturn yy_fatal_error (const char* msg )
  */
 int yyget_lineno  (void)
 {
-<<<<<<< HEAD
     
-=======
-        
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
     return yylineno;
 }
 
@@ -2504,30 +2428,18 @@ char *yyget_text  (void)
 }
 
 /** Set the current line number.
-<<<<<<< HEAD
  * @param _line_number line number
-=======
- * @param line_number
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
  * 
  */
 void yyset_lineno (int  _line_number )
 {
     
-<<<<<<< HEAD
     yylineno = _line_number;
-=======
-    yylineno = line_number;
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
 }
 
 /** Set the input stream. This does not discard the current
  * input buffer.
-<<<<<<< HEAD
  * @param _in_str A readable stream.
-=======
- * @param in_str A readable stream.
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
  * 
  * @see yy_switch_to_buffer
  */
@@ -2560,11 +2472,7 @@ static int yy_init_globals (void)
     /* We do not touch yylineno unless the option is enabled. */
     yylineno =  1;
     
-<<<<<<< HEAD
     (yy_buffer_stack) = NULL;
-=======
-    (yy_buffer_stack) = 0;
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
     (yy_buffer_stack_top) = 0;
     (yy_buffer_stack_max) = 0;
     (yy_c_buf_p) = NULL;

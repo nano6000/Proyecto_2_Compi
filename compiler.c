@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 	}
 	else if(argc > 2){
 		printf("\n\t--Compiladores e Intérpretes, gr40, IIS 2017--\n\nDemasiados Argumentos!\n\nUso: \n    ./compile <fuente.c>\n    ./compile -h  ->  ver la ayuda");
-		return -1
+		return -1;
 	}
 
 	if(1)
@@ -259,7 +259,6 @@ void process_id (char* text)
 	else
 		rs.name = id;*/
 }
-<<<<<<< HEAD
 
 void process_op(char* text) 
 {
@@ -277,28 +276,53 @@ void eval_binary()
 
 	struct SemanticRecord *RSDO;
 	char* inst = malloc(50*sizeof(char));
-	char* variableTemporal = malloc(15*sizeof(char));
-	variableTemporal = generarTemporales(0);
+	char* opA;
+	char* opB;
+	char* variableTemporal = generarTemporales(0);
 
 	if(op1->tag && operador->tag && op2->tag)
 	{
 		struct TOKEN *token = (struct TOKEN *)operador->DataBlock;
-		struct DO *opDO = (struct DO *)op1->DataBlock;
+		struct DO *opDO;
+		struct ID *opID;
+
+		switch(op1->tag)
+		{
+			case _DO:
+				opDO = (struct DO *)op1->DataBlock;
+				opA = opDO->data;
+				break;
+			case _ID:
+				opID = (struct ID *)op1->DataBlock;
+				opA = opID->id;
+				break;
+		}
+
+		switch(op2->tag)
+		{
+			case _DO:
+				opDO = (struct DO *)op2->DataBlock;
+				opB = opDO->data;
+				break;
+			case _ID:
+				opID = (struct ID *)op2->DataBlock;
+				opB = opID->id;
+				break;
+		}
+
 		if(!strcmp(token->data, "+"))
 		{
 			strcpy(inst, "\tmov ");
 			strcat(inst, variableTemporal);
 			strcat(inst, ", ");
-			strcat(inst, opDO->data);
+			strcat(inst, opA);
 			strcat(inst, "\n");
 			escribirSalida(inst);
-
-			opDO = (struct DO *)op2->DataBlock;
 
 			strcpy(inst, "\tadd ");
 			strcat(inst, variableTemporal);
 			strcat(inst, ", ");
-			strcat(inst, opDO->data);
+			strcat(inst, opB);
 			strcat(inst, "\n\n");
 			escribirSalida(inst);
 		}
@@ -308,16 +332,14 @@ void eval_binary()
 			strcpy(inst, "\tmov ");
 			strcat(inst, variableTemporal);
 			strcat(inst, ", ");
-			strcat(inst, opDO->data);
+			strcat(inst, opA);
 			strcat(inst, "\n");
 			escribirSalida(inst);
-
-			opDO = (struct DO *)op2->DataBlock;
 
 			strcpy(inst, "\tsub ");
 			strcat(inst, variableTemporal);
 			strcat(inst, ", ");
-			strcat(inst, opDO->data);
+			strcat(inst, opB);
 			strcat(inst, "\n\n");
 			escribirSalida(inst);
 		}
@@ -325,14 +347,12 @@ void eval_binary()
 		else if(!strcmp(token->data, "*"))
 		{
 			strcpy(inst, "\tmov al, ");
-			strcat(inst, opDO->data);
+			strcat(inst, opA);
 			strcat(inst, "\n");
 			escribirSalida(inst);
 
-			opDO = (struct DO *)op2->DataBlock;
-
 			strcpy(inst, "\tmov cl, ");
-			strcat(inst, opDO->data);
+			strcat(inst, opB);
 			strcat(inst, "\n");
 			escribirSalida(inst);
 
@@ -352,14 +372,13 @@ void eval_binary()
 			escribirSalida(inst);
 
 			strcpy(inst, "\tmov ax, ");
-			strcat(inst, opDO->data);
+			strcat(inst, opA);
 			strcat(inst, "\n");
 			escribirSalida(inst);
 
-			opDO = (struct DO *)op2->DataBlock;
 
 			strcpy(inst, "\tmov bx, ");
-			strcat(inst, opDO->data);
+			strcat(inst, opB);
 			strcat(inst, "\n");
 			escribirSalida(inst);
 
@@ -379,14 +398,12 @@ void eval_binary()
 			escribirSalida(inst);
 
 			strcpy(inst, "\tmov ax, ");
-			strcat(inst, opDO->data);
+			strcat(inst, opA);
 			strcat(inst, "\n");
 			escribirSalida(inst);
 
-			opDO = (struct DO *)op2->DataBlock;
-
 			strcpy(inst, "\tmov bx, ");
-			strcat(inst, opDO->data);
+			strcat(inst, opB);
 			strcat(inst, "\n");
 			escribirSalida(inst);
 
@@ -403,12 +420,10 @@ void eval_binary()
 		else if(!strcmp(token->data, "="))
 		{
 			strcpy(inst, "\tmov ");
-			strcat(inst, opDO->data);
-
-			opDO = (struct DO *)op2->DataBlock;
+			strcat(inst, opA);
 
 			strcat(inst, ", ");
-			strcat(inst, opDO->data);
+			strcat(inst, opB);
 			strcat(inst, "\n\n");
 			escribirSalida(inst);
 

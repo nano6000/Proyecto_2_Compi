@@ -222,11 +222,7 @@ conditional_expression
 
 assignment_expression
 	: conditional_expression
-<<<<<<< HEAD
 	| unary_expression assignment_operator assignment_expression 
-=======
-	| unary_expression { printf("aqui entra\n"); } assignment_operator assignment_expression
->>>>>>> e4280ba25156039a1abcb286eaa5f84c7e9ad58c
 	;
 
 assignment_operator
