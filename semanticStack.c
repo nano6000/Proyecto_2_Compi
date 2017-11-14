@@ -2,16 +2,18 @@
 
 
 LIST newList(void){
-    LIST stack = malloc(sizeof(struct List));
-    if (stack){
+    LIST list;
+    list = malloc(sizeof(struct List));
+    if (list){
 
-       stack->tail_pred = (NODE)&stack->head;
-       stack->tail = 0;
-       stack->head = (NODE)&stack->tail;
-       return stack;
+       list->tail_pred = (NODE)&list->head;
+       list->tail = 0;
+       list->head = (NODE)&list->tail;
+       return list;
     }
     return 0;
 }
+
 
 int isEmpty(LIST l){
    return (l->head->succ == 0);
@@ -39,7 +41,6 @@ NODE PUSH(LIST l, NODE n){
     l->tail_pred = n;
     return n;
 }
-
 
 
 NODE POP(LIST l){
@@ -90,6 +91,17 @@ struct SemanticRecord *createIDSR(char *IDStr){
   return SR;
 }
 
+struct SemanticRecord *createDOSR(char *data){
+  struct SemanticRecord *SR = malloc(sizeof(struct SemanticRecord));
+  struct DO *DODataBlock = malloc(sizeof(struct DO));
+  DODataBlock->id = calloc (strlen(data), sizeof(char));
+  SR->tag = _DO;
+  strcpy(DODataBlock->data, data);
+  SR->DataBlock = DODataBlock;
+  return SR;
+}
+
+/*Libera el espacio usado por un Registro Semántico*/
 void freeSemanticRecord (struct SemanticRecord *semanticRecord){
 
   struct SemanticRecord *SR = (struct SemanticRecord*)semanticRecord;
@@ -106,11 +118,15 @@ void freeSemanticRecord (struct SemanticRecord *semanticRecord){
       free(typeDataBlock->type);
       free(typeDataBlock);
       break;
-    case _DATA_OBJECT:
+    case _DO:
+    DODataBlock = (Struct DO *)SR->DataBlock;
+      free(DODataBlock->data)
+      freE(DODataBlock);
       break;
     case _TOKEN:
       break;
   }
+  free(semanticRecord);
 }
 
 
@@ -127,6 +143,7 @@ struct SymbolTable *newSymbolTable(){
   return 0;
 }
 
+/*Crea un registro de símbolo con su tipo y id*/
 struct SymbolRecord *newSymbolRecord(char* type, char* id){
   struct SymbolRecord *symbol = malloc(sizeof(struct SymbolRecord));
   symbol->type = type;
@@ -134,41 +151,54 @@ struct SymbolRecord *newSymbolRecord(char* type, char* id){
   return symbol;
 }
 
+/*Retorna la static pila semántica */
+LIST getSemanticStack(){
+  static LIST stack;
+  if (!stack){
+    stack = newList();
+  }
+  return stack;
+}
+
+/*Retorna la statick pila de tablas de símbolos */
+LIST getSymbolTableStack(){
+  static LIST symbolTable;
+  if (!symbolTable){
+    symbolTable = newList();
+  }
+  return symbolTable;
+}
 
 
+int SymbolTableStackTest(){
+  LIST SymbolTableStack;
+  SymbolTableStack = newList();
 
-// int main(){
-//   LIST SymbolTableStack;
-//   SymbolTableStack = newList();
-//
-//   PUSH(SymbolTableStack, (NODE)newSymbolTable());
-//
-//
-//   /*Un símbolo, que es un nodo dentro de la tabla de símbolos*/
-//   struct SymbolTable *table = (struct SymbolTable *)GET_TOP(SymbolTableStack);
-//   struct SymbolRecord *symbol = newSymbolRecord("int*", "myIntPointer");
-//   PUSH(table->symbols, (NODE)symbol);
-//   symbol = newSymbolRecord("int2*", "myIntPointer2");
-//   PUSH(table->symbols, (NODE)symbol);
-//   symbol = newSymbolRecord("int3*", "myIntPointer3");
-//   PUSH(table->symbols, (NODE)symbol);
-//
-//
-//   struct SymbolTable *tabla = (struct SymbolTable *)POP(SymbolTableStack);
-//   struct SymbolRecord *simbolo = (struct SymbolRecord *)POP(tabla->symbols);
-//   printf("El símbolo tiene id: %s y tipo: %s\n", simbolo->id, simbolo->type);
-//
-//   simbolo = (struct SymbolRecord *)POP(tabla->symbols);
-//   printf("El símbolo tiene id: %s y tipo: %s\n", simbolo->id, simbolo->type);
-//
-//   simbolo = (struct SymbolRecord *)POP(tabla->symbols);
-//   printf("El símbolo tiene id: %s y tipo: %s\n", simbolo->id, simbolo->type);
-//
-// }
+  PUSH(SymbolTableStack, (NODE)newSymbolTable());
 
 
-int pruebaSR0()
-{
+  /*Un símbolo, que es un nodo dentro de la tabla de símbolos*/
+  struct SymbolTable *table = (struct SymbolTable *)GET_TOP(SymbolTableStack);
+  struct SymbolRecord *symbol = newSymbolRecord("int*", "myIntPointer");
+  PUSH(table->symbols, (NODE)symbol);
+  symbol = newSymbolRecord("int2*", "myIntPointer2");
+  PUSH(table->symbols, (NODE)symbol);
+  symbol = newSymbolRecord("int3*", "myIntPointer3");
+  PUSH(table->symbols, (NODE)symbol);
+
+
+  struct SymbolTable *tabla = (struct SymbolTable *)POP(SymbolTableStack);
+  struct SymbolRecord *simbolo = (struct SymbolRecord *)POP(tabla->symbols);
+  printf("El símbolo tiene id: %s y tipo: %s\n", simbolo->id, simbolo->type);
+
+  simbolo = (struct SymbolRecord *)POP(tabla->symbols);
+  printf("El símbolo tiene id: %s y tipo: %s\n", simbolo->id, simbolo->type);
+
+  simbolo = (struct SymbolRecord *)POP(tabla->symbols);
+  printf("El símbolo tiene id: %s y tipo: %s\n", simbolo->id, simbolo->type);
+  return 0;
+}
+int pruebaSR0(){
     LIST semanticStack;
     struct SemanticRecord *SR;
     struct SemanticRecord *SR2;
@@ -210,8 +240,6 @@ int pruebaSR0()
   }
   return 0;
 }
-
-
 int pruebaSemanticStack0(){
     LIST semanticStack;
     struct SemanticRecord *SR;
@@ -228,7 +256,9 @@ int pruebaSemanticStack0(){
         PUSH(semanticStack, (NODE)SR2);
 
         struct SemanticRecord *TOP = (struct SemanticRecord*)POP(semanticStack);
-        struct SemanticRecord *TOP2 = (struct SemanticRecord*)POP(semanticStack);
+        freeSemanticRecord(TOP);
+        struct SemanticRecord *TOP2 = (struct SemanticRecord*)GET_TOP(semanticStack);
+        struct SemanticRecord *TOP1 = (struct SemanticRecord *)TOP2->node.pred;
 
 
         if (TOP){
@@ -254,7 +284,6 @@ int pruebaSemanticStack0(){
   }
   return 0;
 }
-
 int pruebaRetrieve0(){
   LIST semanticStack;
   struct SemanticRecord *SR;
@@ -291,7 +320,7 @@ int pruebaRetrieve0(){
   return 0;
 }
 
-int main(){
-  pruebaRetrieve0();
-  return 0;
-}
+// int main(){
+//   pruebaRetrieve0();
+//   return 0;
+// }

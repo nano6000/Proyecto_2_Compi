@@ -4,7 +4,7 @@
 #include <string.h>
 #define _ID 1
 #define _TYPE 2
-#define _DATA_OBJECT 3
+#define _DO 3
 #define _TOKEN 4
 
 
@@ -48,6 +48,10 @@ struct Type {
 struct ID{
   char *id;
 };
+
+struct DO{
+  char *data;
+}
 
 
 typedef struct MNode *NODE;
