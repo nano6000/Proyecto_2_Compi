@@ -94,7 +94,7 @@ struct SemanticRecord *createIDSR(char *IDStr){
 struct SemanticRecord *createDOSR(char *data){
   struct SemanticRecord *SR = malloc(sizeof(struct SemanticRecord));
   struct DO *DODataBlock = malloc(sizeof(struct DO));
-  DODataBlock->id = calloc (strlen(data), sizeof(char));
+  DODataBlock->data = calloc (strlen(data), sizeof(char));
   SR->tag = _DO;
   strcpy(DODataBlock->data, data);
   SR->DataBlock = DODataBlock;
@@ -106,6 +106,7 @@ void freeSemanticRecord (struct SemanticRecord *semanticRecord){
 
   struct SemanticRecord *SR = (struct SemanticRecord*)semanticRecord;
   struct ID *IDDataBlock;
+  struct DO *DODataBlock;
   struct Type *typeDataBlock;
   switch (SR->tag) {
     case _ID:
@@ -119,9 +120,9 @@ void freeSemanticRecord (struct SemanticRecord *semanticRecord){
       free(typeDataBlock);
       break;
     case _DO:
-    DODataBlock = (Struct DO *)SR->DataBlock;
-      free(DODataBlock->data)
-      freE(DODataBlock);
+    DODataBlock = (struct DO *)SR->DataBlock;
+      free(DODataBlock->data);
+      free(DODataBlock);
       break;
     case _TOKEN:
       break;
@@ -320,7 +321,7 @@ int pruebaRetrieve0(){
   return 0;
 }
 
-// int main(){
-//   pruebaRetrieve0();
-//   return 0;
-// }
+int main(){
+  //pruebaRetrieve0();
+  return 0;
+}

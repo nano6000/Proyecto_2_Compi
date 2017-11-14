@@ -51,7 +51,7 @@ struct ID{
 
 struct DO{
   char *data;
-}
+};
 
 
 typedef struct MNode *NODE;
