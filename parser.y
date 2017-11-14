@@ -6,7 +6,7 @@ void yyerror(const char *s);
 %}
 
 
-%token	ID CONSTANT STRING FUNC_NAME SIZEOF
+%token	CONSTANT STRING FUNC_NAME SIZEOF
 %token	PTR_OP INC_OP DEC_OP SHL SHR LE_OP GE_OP EQ_OP NE_OP
 %token	AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token	SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
@@ -28,12 +28,20 @@ void yyerror(const char *s);
 %token STAR SLASH BACKSLASH MODULO LESS_THAN GREATER_THAN CARET PIPE QUESTION_MARK
 %token CHARACTER SEPARATOR QOUTE
 
+%token <string>   ID
+
 %start translation_unit
 %define parse.error verbose
+
+%union {
+  int      value;
+  char     *string;
+}
+
 %%
 
 primary_expression
-	: ID
+	: ID { printf("%s\n", $1);}
 	| { process_literal(yytext); } CONSTANT
 	| STRING
 	| LPARENTHESIS expression RPARENTHESIS	
@@ -182,7 +190,7 @@ conditional_expression
 
 assignment_expression
 	: conditional_expression
-	| { process_id(yytext); } unary_expression assignment_operator assignment_expression 
+	| unary_expression { printf("aqui entra\n"); } assignment_operator assignment_expression 
 	;
 
 assignment_operator

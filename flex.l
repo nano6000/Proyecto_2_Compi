@@ -136,9 +136,9 @@ COMMENT		    ("/*"[^*]*[*]+([^/*][^*]*[*]+)*[/])|"//".*
 
 {STRING}				return STRING;
 {CHARACTER}			    return CONSTANT;
-{ID}					yylval.str_t = strdup(yytext); return ID;
+{ID}					yylval.string = strdup(yytext); return ID;
 [ \t\n] 				return SEPARATOR;
-<<EOF>>    			    free(yyval.str_t); return 0;
+<<EOF>>    			    free(yylval.string); return 0;
 {COMMENT}				;
 
 

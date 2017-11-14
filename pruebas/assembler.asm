@@ -3,6 +3,6 @@
 	jmp label0003
 label0002:
 label0003:
-	jmp label0001
-label0000:
-label0001:
+	jmp label0003
+label0002:
+label0003:

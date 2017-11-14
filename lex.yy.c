@@ -1523,7 +1523,7 @@ return CONSTANT;
 case 102:
 YY_RULE_SETUP
 #line 139 "flex.l"
-yylval.str_t = strdup(yytext); return ID;
+yylval.string = strdup(yytext); return ID;
 	YY_BREAK
 case 103:
 /* rule 103 can match eol */
@@ -1533,7 +1533,7 @@ return SEPARATOR;
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 #line 141 "flex.l"
-free(yyval.str_t); return 0;
+free(yylval.string); return 0;
 	YY_BREAK
 case 104:
 /* rule 104 can match eol */
