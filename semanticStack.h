@@ -4,7 +4,7 @@
 #include <string.h>
 #define _ID 1
 #define _TYPE 2
-#define _DATA_OBJECT 3
+#define _DO 3
 #define _TOKEN 4
 #define _IF 5
 
@@ -54,6 +54,11 @@ struct IFS{
   char *begin_label;
   char *exit_label;
 };
+
+struct DO{
+  char *data;
+};
+
 
 typedef struct MNode *NODE;
 typedef struct List *LIST;
